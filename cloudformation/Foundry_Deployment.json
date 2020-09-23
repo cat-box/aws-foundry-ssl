@@ -320,22 +320,14 @@
 				"ToPort": 22
 			}
 		},
-		"Route53HZ": {
-			"Condition": "CreateRoute53",
-			"Type": "AWS::Route53::HostedZone",
-			"Properties": {
-				"Name": { "Ref": "FullyQualifiedDomainName" }
-			}
-		},
 		"Route53RSFoundry": {
 			"Type": "AWS::Route53::RecordSet",
 			"Condition": "CreateRoute53",
 			"Properties": {
 				"Name": {"Fn::Join" : ["",[ { "Ref": "SubdomainName" }, ".", { "Ref": "FullyQualifiedDomainName" } ] ]},
 				"Type": "A",
-				"HostedZoneId": { "Ref": "Route53HZ" },
-				"Region": { "Ref": "AWS::Region" },
-				"ResourceRecords": [ "127.0.0.1" ],
+				"HostedZoneName": {"Fn::Join" : [ "", [{ "Ref": "FullyQualifiedDomainName" }, "."] ]},
+				"ResourceRecords": [{ "Fn::GetAtt": ["FoundryServer", "PublicIp"]}],
 				"TTL": "60"
 			}
 		},
@@ -345,9 +337,8 @@
 			"Properties": {
 				"Name": { "Ref": "FullyQualifiedDomainName" },
 				"Type": "A",
-				"HostedZoneId": { "Ref": "Route53HZ" },
-				"Region": { "Ref": "AWS::Region" },
-				"ResourceRecords": [ "127.0.0.1" ],
+				"HostedZoneName": {"Fn::Join" : [ "", [{ "Ref": "FullyQualifiedDomainName" }, "."] ]},
+				"ResourceRecords": [{ "Fn::GetAtt": ["FoundryServer", "PublicIp"]}],
 				"TTL": "60"
 			}
 		},
@@ -357,8 +348,7 @@
 			"Properties": {
 				"Name": {"Fn::Join" : ["",[ "www.", { "Ref": "FullyQualifiedDomainName" } ] ]},
 				"Type": "CNAME",
-				"HostedZoneId": { "Ref": "Route53HZ" },
-				"Region": { "Ref": "AWS::Region" },
+				"HostedZoneName": {"Fn::Join" : [ "", [{ "Ref": "FullyQualifiedDomainName" }, "."] ]},
 				"ResourceRecords": [ { "Ref": "FullyQualifiedDomainName" } ],
 				"TTL": "60"
 			}

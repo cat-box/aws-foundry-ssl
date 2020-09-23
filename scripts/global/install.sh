@@ -5,6 +5,8 @@ source /aws-foundry-ssl/variables/foundry_variables.sh
 echo $domain_registrar > /registrar.txr
 case ${domain_registrar} in
     amazon)
+        sleep 20s
+        source /aws-foundry-ssl/scripts/amazon/hosted_zone_id.sh
         ;;
     godaddy)
         # set dns records and install dynamic dns
