@@ -13,7 +13,13 @@
 					"Label": {
 						"default": "SSL Configuration"
 					},
-					"Parameters": ["FullyQualifiedDomainName", "SubdomainName", "APIKey", "APISecret", "Email", "DomainRegistrar", "WebServerBool", "GoogleAPIKey"]
+					"Parameters": ["FullyQualifiedDomainName", "SubdomainName", "DomainRegistrar", "WebServerBool", "APIKey", "APISecret", "Email"]
+				},
+				{
+					"Label": {
+						"default": "Google Web Server"
+					},
+					"Parameters": ["GoogleAPIKey", "GoogleAPISecret"]
 				}
 			]
 		}
@@ -110,7 +116,7 @@
 			"ConstraintDescription": "Must be all lowercase, no letters, no spaces, and no symbols."
 		},
 		"APIKey": {
-			"Description": "API Key from your domain registrar. This will be used to point the domain to the ec2 instance.",
+			"Description": "API Key from your domain registrar. If you are using Namecheap this will just be the same value you entered for FullyQualifiedDomainName.",
 			"Type": "String"
 		},
 		"APISecret": {
@@ -141,12 +147,12 @@
 			"Default": "False"
 		},
 		"GoogleAPIKey": {
-			"Description": "This only matters if WebServer is set to true, and DomainRegistrar is set to google.",
+			"Description": "This only matters if WebServer is set to true, and DomainRegistrar is set to google. If both of these conditions are not true ignore this parameter. Key for base domain dynamic DNS.",
 			"Default": "null",
 			"Type": "String"
 		},
 		"GoogleAPISecret": {
-			"Description": "This only matters if WebServer is set to true, and DomainRegistrar is set to google. If both of these are not ",
+			"Description": "This only matters if WebServerBool is set to true, and DomainRegistrar is set to google. If both of these conditions are not true ignore this parameter. Secret for base domain dynamic DNS.",
 			"Default": "null",
 			"Type": "String"
 		}
@@ -179,6 +185,30 @@
 					"Ref": "TakeSnapshots"
 				},
 				"True"
+			]
+		},
+		"CreateRoute53": {
+			"Fn::Equals": [{
+					"Ref": "DomainRegistrar"
+				},
+				"amazon"
+			]
+		},
+		"CreateWebServer": {
+			"Fn::Equals": [{
+				"Ref": "WebServerBool"
+			},
+			"True"
+		]
+		},
+		"Route53WebServer": {
+			"Fn::And": [
+				{
+					"Condition": "CreateRoute53"
+				}, 
+				{
+					"Condition": "CreateWebServer" 
+				}
 			]
 		},
 		"NoExistingS3": {
@@ -288,6 +318,49 @@
 				"FromPort": 22,
 				"IpProtocol": "tcp",
 				"ToPort": 22
+			}
+		},
+		"Route53HZ": {
+			"Condition": "CreateRoute53",
+			"Type": "AWS::Route53::HostedZone",
+			"Properties": {
+				"Name": { "Ref": "FullyQualifiedDomainName" }
+			}
+		},
+		"Route53RSFoundry": {
+			"Type": "AWS::Route53::RecordSet",
+			"Condition": "CreateRoute53",
+			"Properties": {
+				"Name": {"Fn::Join" : ["",[ { "Ref": "SubdomainName" }, ".", { "Ref": "FullyQualifiedDomainName" } ] ]},
+				"Type": "A",
+				"HostedZoneId": { "Ref": "Route53HZ" },
+				"Region": { "Ref": "AWS::Region" },
+				"ResourceRecords": [ "127.0.0.1" ],
+				"TTL": "60"
+			}
+		},
+		"Route53RSWeb": {
+			"Type": "AWS::Route53::RecordSet",
+			"Condition": "Route53WebServer",
+			"Properties": {
+				"Name": { "Ref": "FullyQualifiedDomainName" },
+				"Type": "A",
+				"HostedZoneId": { "Ref": "Route53HZ" },
+				"Region": { "Ref": "AWS::Region" },
+				"ResourceRecords": [ "127.0.0.1" ],
+				"TTL": "60"
+			}
+		},
+		"Route53RSWebWWW": {
+			"Type": "AWS::Route53::RecordSet",
+			"Condition": "Route53WebServer",
+			"Properties": {
+				"Name": {"Fn::Join" : ["",[ "www.", { "Ref": "FullyQualifiedDomainName" } ] ]},
+				"Type": "CNAME",
+				"HostedZoneId": { "Ref": "Route53HZ" },
+				"Region": { "Ref": "AWS::Region" },
+				"ResourceRecords": [ { "Ref": "FullyQualifiedDomainName" } ],
+				"TTL": "60"
 			}
 		},
 		"FoundryBucket": {
@@ -516,71 +589,81 @@
 					"PolicyName": "EC2Manager",
 					"PolicyDocument": {
 						"Version": "2012-10-17",
-						"Statement": [{
-							"Sid": "VisualEditor0",
-							"Effect": "Allow",
-							"Action": [
-								"ec2:CopySnapshot",
-								"ec2:DescribeInstances",
-								"ec2:ModifyVolumeAttribute",
-								"ec2:CreateKeyPair",
-								"ec2:CreateImage",
-								"ec2:CopyImage",
-								"ec2:DescribeSnapshots",
-								"ec2:GetConsoleScreenshot",
-								"ec2:DescribeInternetGateways",
-								"ec2:DescribeVolumeStatus",
-								"ec2:ModifySnapshotAttribute",
-								"ec2:StartInstances",
-								"ec2:DescribeVolumes",
-								"ec2:DescribeAccountAttributes",
-								"ec2:ImportImage",
-								"ec2:DescribeKeyPairs",
-								"ec2:DescribeNetworkAcls",
-								"ec2:DescribeRouteTables",
-								"ec2:ModifyVolume",
-								"ec2:CancelExportTask",
-								"ec2:DisableFastSnapshotRestores",
-								"ec2:ImportKeyPair",
-								"ec2:CreateTags",
-								"ec2:RunInstances",
-								"ec2:StopInstances",
-								"ec2:DescribeVolumeAttribute",
-								"ec2:CreateVolume",
-								"ec2:DescribeImportSnapshotTasks",
-								"ec2:CreateSnapshots",
-								"ec2:DescribeImageAttribute",
-								"ec2:DescribeInstanceTypes",
-								"ec2:DescribeSubnets",
-								"ec2:ExportImage",
-								"ec2:AttachVolume",
-								"ec2:ImportVolume",
-								"ec2:DeleteSnapshot",
-								"ec2:DeleteTags",
-								"ec2:DescribeInstanceAttribute",
-								"ec2:DescribeRegions",
-								"ec2:CreateVpc",
-								"ec2:DescribeVpcAttribute",
-								"ec2:GetConsoleOutput",
-								"ec2:EnableFastSnapshotRestores",
-								"ec2:DescribeAvailabilityZones",
-								"ec2:CreateSecurityGroup",
-								"ec2:CreateSnapshot",
-								"ec2:DescribeInstanceStatus",
-								"ec2:DescribeTags",
-								"ec2:ResetSnapshotAttribute",
-								"ec2:ImportSnapshot",
-								"ec2:DescribeImportImageTasks",
-								"ec2:DescribeNatGateways",
-								"ec2:DescribeInstanceEventNotificationAttributes",
-								"ec2:DescribeSecurityGroups",
-								"ec2:DescribeImages",
-								"ec2:DescribeSecurityGroupReferences",
-								"ec2:DescribeVpcs",
-								"ec2:CancelImportTask"
-							],
-							"Resource": "*"
-						}]
+						"Statement": [
+							{
+								"Sid": "VisualEditor0",
+								"Effect": "Allow",
+								"Action": [
+									"ec2:CopySnapshot",
+									"ec2:DescribeInstances",
+									"ec2:ModifyVolumeAttribute",
+									"ec2:CreateKeyPair",
+									"route53:GetHostedZone",
+									"ec2:CreateImage",
+									"ec2:CopyImage",
+									"ec2:DescribeSnapshots",
+									"ec2:GetConsoleScreenshot",
+									"ec2:DescribeInternetGateways",
+									"ec2:DescribeVolumeStatus",
+									"ec2:ModifySnapshotAttribute",
+									"ec2:StartInstances",
+									"ec2:DescribeVolumes",
+									"route53:ListResourceRecordSets",
+									"ec2:DescribeAccountAttributes",
+									"route53:GetHostedZoneCount",
+									"route53:UpdateHostedZoneComment",
+									"ec2:ImportImage",
+									"ec2:DescribeKeyPairs",
+									"ec2:DescribeNetworkAcls",
+									"ec2:DescribeRouteTables",
+									"ec2:ModifyVolume",
+									"ec2:CancelExportTask",
+									"route53:CreateHostedZone",
+									"ec2:DisableFastSnapshotRestores",
+									"ec2:ImportKeyPair",
+									"ec2:CreateTags",
+									"route53:ChangeResourceRecordSets",
+									"ec2:RunInstances",
+									"ec2:StopInstances",
+									"ec2:DescribeVolumeAttribute",
+									"ec2:CreateVolume",
+									"ec2:DescribeImportSnapshotTasks",
+									"ec2:CreateSnapshots",
+									"ec2:DescribeImageAttribute",
+									"ec2:DescribeInstanceTypes",
+									"ec2:DescribeSubnets",
+									"ec2:ExportImage",
+									"ec2:AttachVolume",
+									"ec2:ImportVolume",
+									"ec2:DeleteSnapshot",
+									"ec2:DeleteTags",
+									"ec2:DescribeInstanceAttribute",
+									"ec2:DescribeRegions",
+									"ec2:CreateVpc",
+									"ec2:DescribeVpcAttribute",
+									"ec2:GetConsoleOutput",
+									"ec2:EnableFastSnapshotRestores",
+									"ec2:DescribeAvailabilityZones",
+									"ec2:CreateSecurityGroup",
+									"ec2:CreateSnapshot",
+									"route53:DeleteHostedZone",
+									"ec2:DescribeInstanceStatus",
+									"ec2:DescribeTags",
+									"ec2:ResetSnapshotAttribute",
+									"ec2:ImportSnapshot",
+									"route53:ListHostedZones",
+									"ec2:DescribeImportImageTasks",
+									"ec2:DescribeNatGateways",
+									"ec2:DescribeInstanceEventNotificationAttributes",
+									"ec2:DescribeSecurityGroups",
+									"ec2:DescribeImages",
+									"ec2:DescribeSecurityGroupReferences",
+									"ec2:DescribeVpcs",
+									"ec2:CancelImportTask"
+								],
+								"Resource": "*"
+							}
+						]
 					}
 				}]
 			}
