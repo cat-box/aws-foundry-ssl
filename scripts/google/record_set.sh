@@ -17,8 +17,8 @@ sudo sed -i "s/fqdn/${fqdn}/g" /aws-foundry-ssl/files/ddns/google/${client_conf}
 
 if [[ ${webserver_bool} == "True" ]]
 then
-    sudo sed -i "s/web_server_api_key/${web_server_api_key}/g" /aws-foundry-ssl/files/ddns/google/${client_conf}
-    sudo sed -i "s/web_server_api_secret/${web_server_api_secret}/g" /aws-foundry-ssl/files/ddns/google/${client_conf}
+    sudo sed -i "s/webserver_user/${webserver_user}/g" /aws-foundry-ssl/files/ddns/google/${client_conf}
+    sudo sed -i "s/webserver_pass/${webserver_pass}/g" /aws-foundry-ssl/files/ddns/google/${client_conf}
 fi
 
 sudo cat /aws-foundry-ssl/files/ddns/google/${client_conf} >> /etc/ddclient.conf
