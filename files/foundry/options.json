@@ -1,0 +1,20 @@
+{
+  "port": 30000,
+  "upnp": true,
+  "fullscreen": false,
+  "hostname": "YOURSUBDOMAINHERE.YOURDOMAINHERE",
+  "routePrefix": null,
+  "sslCert": null,
+  "sslKey": null,
+  "awsConfig": "/foundrydata/Config/AWS.json",
+  "dataPath": "/foundrydata",
+  "proxySSL": true,
+  "proxyPort": "443",
+  "updateChannel": "release",
+  "world": null,
+  "turnListeningPort": 33478,
+  "turnListeningIps": ["0.0.0.0"],
+  "turnRelayIps": [],
+  "turnMinPort": 49152,
+  "turnMaxPort": 65535
+}
