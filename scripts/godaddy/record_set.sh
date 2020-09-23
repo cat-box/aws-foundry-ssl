@@ -8,11 +8,11 @@ instance_ip=$(dig +short myip.opendns.com @resolver1.opendns.com)
 
 # adds custom foundry subdomain to GoDaddy Host Records
 # curl -X PUT 
-# 	  -H "Authorization: sso-key ${api_key}:${api_secret}" "https://api.godaddy.com/v1/domains/chonkycats.ca/records/A/foundry" 
+# 	  -H "Authorization: sso-key ${api_key}:${api_secret}" "https://api.godaddy.com/v1/domains/${fqdn}/records/A/foundry" 
 #     -H "Content-Type: application/json" 
 #     -H "Accept: application/json" 
 #     -d "[{\"data\": \"${instance_ip}\",\"name\": \"${subdomain}\", \"ttl\": 1800, \"type\": \"A\"}]"
-curl -X PUT -H "Authorization: sso-key ${api_key}:${api_secret}" "https://api.godaddy.com/v1/domains/chonkycats.ca/records/A/foundry" -H "Content-Type: application/json" -H "Accept: application/json" -d "[{\"data\": \"${instance_ip}\",\"name\": \"${subdomain}\", \"ttl\": 1800, \"type\": \"A\"}]"
+curl -X PUT -H "Authorization: sso-key ${api_key}:${api_secret}" "https://api.godaddy.com/v1/domains/${fqdn}/records/A/foundry" -H "Content-Type: application/json" -H "Accept: application/json" -d "[{\"data\": \"${instance_ip}\",\"name\": \"${subdomain}\", \"ttl\": 1800, \"type\": \"A\"}]"
 
 if [[ "${webserver_bool}" == "True" ]]
 then

@@ -464,7 +464,7 @@
 								"curl --silent --location https://rpm.nodesource.com/setup_12.x | sudo bash -\n",
 								"sudo yum install -y git\n",
 								"cd /\n",
-								"git clone --branch development https://github.com/cat-box/aws-foundry-ssl.git\n",
+								"git clone https://github.com/cat-box/aws-foundry-ssl.git\n",
 								"mkdir /foundry /foundrydata /aws-foundry-ssl/variables /foundryssl\n",
 								
 								"echo '#!/bin/bash' >> /aws-foundry-ssl/variables/foundry_variables.sh\n",
