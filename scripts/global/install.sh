@@ -2,7 +2,7 @@
 
 source /foundryssl/variables.sh
 source /aws-foundry-ssl/variables/foundry_variables.sh
-echo $domain_registrar > /registrar.txr
+
 case ${domain_registrar} in
     amazon)
         sleep 20s

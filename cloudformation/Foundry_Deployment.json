@@ -13,7 +13,13 @@
 					"Label": {
 						"default": "SSL Configuration"
 					},
-					"Parameters": ["FullyQualifiedDomainName", "SubdomainName", "DomainRegistrar", "WebServerBool", "APIKey", "APISecret", "Email"]
+					"Parameters": ["FullyQualifiedDomainName", "SubdomainName", "DomainRegistrar", "WebServerBool", "Email"]
+				},
+				{
+					"Label": {
+						"default": "GoDaddy, Google, and NameCheap"
+					},
+					"Parameters": ["APIKey", "APISecret"]
 				},
 				{
 					"Label": {
@@ -147,12 +153,12 @@
 			"Default": "False"
 		},
 		"GoogleAPIKey": {
-			"Description": "This only matters if WebServer is set to true, and DomainRegistrar is set to google. If both of these conditions are not true ignore this parameter. Key for base domain dynamic DNS.",
+			"Description": "This only matters if WebServer is set to true, and DomainRegistrar is set to google. If both of these conditions are not true ignore this parameter. Key for fully qualified domain name dynamic DNS.",
 			"Default": "null",
 			"Type": "String"
 		},
 		"GoogleAPISecret": {
-			"Description": "This only matters if WebServerBool is set to true, and DomainRegistrar is set to google. If both of these conditions are not true ignore this parameter. Secret for base domain dynamic DNS.",
+			"Description": "This only matters if WebServerBool is set to true, and DomainRegistrar is set to google. If both of these conditions are not true ignore this parameter. Secret for fully qualified domain name dynamic DNS.",
 			"Default": "null",
 			"Type": "String"
 		}
