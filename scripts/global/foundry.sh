@@ -38,3 +38,7 @@ sudo sed -i "s/REGIONHERE/${region}/g" /foundrydata/Config/AWS.json
 
 # configure foundry options file
 sudo sed -i 's|"awsConfig":.*|"awsConfig": "/foundrydata/Config/AWS.json",|g' /foundrydata/Config/options.json
+
+# allow rwx in the Data folder only for ec2-user
+sudo chown ec2-user -R /foundrydata/Data
+sudo chmod 755 -R /foundrydata/Data
