@@ -314,18 +314,6 @@
 				"ToPort": 443
 			}
 		},
-		"SecurityGroupIngressSSH": {
-			"Type": "AWS::EC2::SecurityGroupIngress",
-			"Properties": {
-				"GroupId": {
-					"Fn::GetAtt": ["FoundryServerSG", "GroupId"]
-				},
-				"CidrIp": "0.0.0.0/0",
-				"FromPort": 22,
-				"IpProtocol": "tcp",
-				"ToPort": 22
-			}
-		},
 		"Route53RSFoundry": {
 			"Type": "AWS::Route53::RecordSet",
 			"Condition": "CreateRoute53",

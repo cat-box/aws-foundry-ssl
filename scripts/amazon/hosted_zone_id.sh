@@ -9,4 +9,3 @@ echo "zone_id=${zone_id}" >> /foundryssl/variables.sh
 sudo cp /aws-foundry-ssl/scripts/amazon/dynamic_dns.sh /foundryssl/dynamic_dns.sh
 crontab -l | { cat; echo "@reboot    /foundryssl/dynamic_dns.sh > /dev/null"; } | crontab -
 crontab -l | { cat; echo "*/10 * * * *    /foundryssl/dynamic_dns.sh > /dev/null"; } | crontab -
-
