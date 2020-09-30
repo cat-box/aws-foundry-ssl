@@ -29,7 +29,7 @@ sudo sed -i 's/"proxyPort":.*/"proxyPort": "80",/g' /foundrydata/Config/options.
 if [[ ${webserver_bool} == "True" ]]
 then
     # copy webserver files
-    git clone https://github.com/zkkng/foundry-website.git
+    git clone https://github.com/zkkng/foundry-website.git /foundry-website
     sudo cp -rf /foundry-website/* /usr/share/nginx/html
 
     # give ec2-user permissions
