@@ -1,7 +1,5 @@
 #!/bin/bash
 
-touch /godaddy_record_ran.txt
-
 # grab public ip address
 source /foundryssl/variables.sh
 instance_ip=$(dig +short myip.opendns.com @resolver1.opendns.com)
