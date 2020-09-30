@@ -37,7 +37,7 @@ then
     sudo chmod 755 -R /usr/share/nginx/html
 
     # clean up install files
-    # sudo rm -r /foundry-website
+    sudo rm -r /foundry-website
 fi
 
 systemctl restart nginx

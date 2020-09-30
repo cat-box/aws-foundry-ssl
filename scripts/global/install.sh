@@ -27,11 +27,10 @@ source /aws-foundry-ssl/scripts/global/foundry.sh
 source /aws-foundry-ssl/scripts/global/nginx.sh
 
 # set up certificates
-# disabled for testing
-# source /aws-foundry-ssl/scripts/global/certbot.sh
+source /aws-foundry-ssl/scripts/global/certbot.sh
 
 # clean up install files
 # Do not do this during testing
-# sudo rm -r /aws-foundry-ssl
+sudo rm -r /aws-foundry-ssl
 
 reboot now
