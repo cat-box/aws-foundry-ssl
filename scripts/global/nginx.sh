@@ -25,9 +25,19 @@ sudo systemctl enable nginx
 sudo sed -i "s/\"hostname\":.*/\"hostname\": \"${subdomain}\.${fqdn}\",/g" /foundrydata/Config/options.json
 sudo sed -i 's/"proxyPort":.*/"proxyPort": "80",/g' /foundrydata/Config/options.json
 
-# allow rwx in the html folder only for ec2-user
-/bin/cp -rf /aws-foundry-ssl/website/* /usr/share/nginx/html
-sudo chown ec2-user -R /usr/share/nginx/html
-sudo chmod 755 -R /usr/share/nginx/html
+# setup webserver
+if [[ ${webserver_bool} == "True" ]]
+then
+    # copy webserver files
+    git clone https://github.com/zkkng/foundry-website.git
+    /bin/cp -rf /foundry-website/* /usr/share/nginx/html
+
+    # give ec2-user permissions
+    sudo chown ec2-user -R /usr/share/nginx/html
+    sudo chmod 755 -R /usr/share/nginx/html
+
+    # clean up install files
+    sudo rm -r /foundry-website
+fi
 
 systemctl restart nginx
