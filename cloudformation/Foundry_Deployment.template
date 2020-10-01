@@ -168,6 +168,9 @@
 			"us-east-1": {
 				"AMILinux": "ami-0c94855ba95c71c99"
 			},
+			"us-east-2":{
+				"AMILinux": "ami-03657b56516ab7912"
+			},
 			"us-west-2": {
 				"AMILinux": "ami-01ce4793a2f45922e"
 			},
