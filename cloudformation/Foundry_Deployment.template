@@ -1,6 +1,6 @@
 {
 	"AWSTemplateFormatVersion": "2010-09-09",
-	"Description": "Automated process to setup foundry exactly as the following guide dictates https://foundry-vtt-community.github.io/wiki/Self-Hosting-on-AWS/ It also allows for optional snap-shots. Made by Lupert.",
+	"Description": "Automated process to setup foundry exactly as the following guides dictate https://foundry-vtt-community.github.io/wiki/Self-Hosting-on-AWS/ and https://foundryvtt.com/article/nginx/. It also allows for optional snap-shots. Made by Lupert and Cat.",
 	"Metadata": {
 		"AWS::CloudFormation::Interface": {
 			"ParameterGroups": [{
