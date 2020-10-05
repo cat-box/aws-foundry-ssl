@@ -54,10 +54,10 @@
 			"Type": "String"
 		},
 		"S3BucketName": {
-			"Description": "Name for S3 bucket that will be created. This must be globally unique across all of AWS, so be a little creative. Must be all lowercase, no spaces, and no symbols expect dash (-).",
-			"ConstraintDescription": "This must be globally unique across all of AWS, so be a little creative. Must be all lowercase, no spaces, and no symbols expect dash (-).",
+			"Description": "Name for S3 bucket that will be created. This must be globally unique across all of AWS, so be a little creative. Must be all lowercase letters or numbers, no spaces, and no symbols expect dash (-).",
+			"ConstraintDescription": "This must be globally unique across all of AWS, so be a little creative. Must be all lowercase letters or numbers, no spaces, and no symbols expect dash (-).",
 			"Type": "String",
-			"AllowedPattern": "^[a-z]+(-[a-z]+)*$"
+			"AllowedPattern": "^[a-z|0-9]+(-[a-z|0-9]+)*$"
 		},
 		"SnapshotFrequency": {
 			"Description": "Decides how often you want to take snapshots. This value does not matter if you select False for TakeSnapshots",
