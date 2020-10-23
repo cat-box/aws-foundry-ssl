@@ -1,0 +1,15 @@
+[Unit]
+Description=Foundry VTT
+After=network.target
+
+[Service]
+Environment=NODE_PORT=30000
+WorkingDirectory=/foundry/resources/app
+Type=simple
+User=root
+ExecStart=/usr/bin/node /foundry/resources/app/main.js --dataPath=/foundrydata
+Restart=always
+RestartSec=10s
+
+[Install]
+WantedBy=multi-user.target

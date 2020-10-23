@@ -23,10 +23,11 @@ unzip -u foundry.zip
 rm foundry.zip
 
 # start foundry and add to boot
-echo 'node /foundry/resources/app/main.js --dataPath=/foundrydata' >> /etc/rc.local
-sudo chmod a+x /etc/rc.local
-
-node /foundry/resources/app/main.js --dataPath=/foundrydata &
+sudo cp /aws-foundry-ssl/files/foundry/foundry.service /etc/systemd/system/foundry.service
+sudo chmod 644 /etc/systemd/system/foundry.service
+sudo systemctl daemon-reload
+sudo systemctl start foundry
+sudo systemctl enable foundry
 sleep 10s
 
 # configure foundry aws json file
