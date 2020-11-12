@@ -187,7 +187,7 @@
 				"AMILinux": "ami-08c148bb835696b45"
 			},
 			"sa-east-1": {
-				"AMILinux": "ami-0b647bd2cd67b5c77"
+				"AMILinux": "ami-02898a1921d38a50b"
 			}
 		}
 	},
