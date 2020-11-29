@@ -102,6 +102,7 @@
 				"t2.small",
 				"t2.medium",
 				"t2.large",
+				"t3.micro",
 				"m4.large",
 				"m4.xlarge",
 				"m4.2xlarge",
@@ -179,6 +180,9 @@
 			},
 			"ap-southeast-2": {
 				"AMILinux": "ami-0099823645f06b6a1"
+			},
+			"eu-north-1": {
+				"AMILinux": "ami-02511cb3673b49e04"
 			},
 			"eu-west-1": {
 				"AMILinux": "ami-08a2aed6e0a6f9c7d"
