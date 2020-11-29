@@ -134,7 +134,7 @@
 			"Type": "String"
 		},
 		"DomainRegistrar": {
-			"Description": "A valid email address is required for letsencrypt certs.",
+			"Description": "The domain registrar from which the domain was purchased from.",
 			"Type": "String",
 			"AllowedValues": [
 				"google",
