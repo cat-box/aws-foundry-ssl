@@ -33,9 +33,9 @@ sleep 10s
 # configure foundry aws json file
 sudo cp /aws-foundry-ssl/files/foundry/options.json /foundrydata/Config/options.json
 sudo cp /aws-foundry-ssl/files/foundry/AWS.json /foundrydata/Config/AWS.json
-sudo sed -i "s/ACCESSKEYIDHERE/${access_key_id}/g" /foundrydata/Config/AWS.json
-sudo sed -i "s/SECRETACCESSKEYHERE/${secret_access_key}/g" /foundrydata/Config/AWS.json
-sudo sed -i "s/REGIONHERE/${region}/g" /foundrydata/Config/AWS.json
+sudo sed -i "s|ACCESSKEYIDHERE|${access_key_id}|g" /foundrydata/Config/AWS.json
+sudo sed -i "s|SECRETACCESSKEYHERE|${secret_access_key}|g" /foundrydata/Config/AWS.json
+sudo sed -i "s|REGIONHERE|${region}|g" /foundrydata/Config/AWS.json
 
 # configure foundry options file
 sudo sed -i 's|"awsConfig":.*|"awsConfig": "/foundrydata/Config/AWS.json",|g' /foundrydata/Config/options.json
