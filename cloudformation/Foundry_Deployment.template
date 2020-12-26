@@ -328,9 +328,9 @@
 			"Type": "AWS::Route53::RecordSet",
 			"Condition": "CreateRoute53",
 			"Properties": {
-				"Name": {"Fn::Join" : ["",[ { "Ref": "SubdomainName" }, ".", { "Ref": "FullyQualifiedDomainName" } ] ]},
+				"Name": { "Fn::Sub" : "${SubdomainName}.${FullyQualifiedDomainName}" },
 				"Type": "A",
-				"HostedZoneName": {"Fn::Join" : [ "", [{ "Ref": "FullyQualifiedDomainName" }, "."] ]},
+				"HostedZoneName": { "Fn::Sub": "${FullyQualifiedDomainName}." },
 				"ResourceRecords": [{ "Fn::GetAtt": ["FoundryServer", "PublicIp"]}],
 				"TTL": "60"
 			}
@@ -341,7 +341,7 @@
 			"Properties": {
 				"Name": { "Ref": "FullyQualifiedDomainName" },
 				"Type": "A",
-				"HostedZoneName": {"Fn::Join" : [ "", [{ "Ref": "FullyQualifiedDomainName" }, "."] ]},
+				"HostedZoneName": { "Fn::Sub": "${FullyQualifiedDomainName}." },
 				"ResourceRecords": [{ "Fn::GetAtt": ["FoundryServer", "PublicIp"]}],
 				"TTL": "60"
 			}
@@ -350,9 +350,9 @@
 			"Type": "AWS::Route53::RecordSet",
 			"Condition": "Route53WebServer",
 			"Properties": {
-				"Name": {"Fn::Join" : ["",[ "www.", { "Ref": "FullyQualifiedDomainName" } ] ]},
+				"Name": {"Fn::Sub": "www.${FullyQualifiedDomainName}" },
 				"Type": "CNAME",
-				"HostedZoneName": {"Fn::Join" : [ "", [{ "Ref": "FullyQualifiedDomainName" }, "."] ]},
+				"HostedZoneName": {"Fn::Sub": "${FullyQualifiedDomainName}." },
 				"ResourceRecords": [ { "Ref": "FullyQualifiedDomainName" } ],
 				"TTL": "60"
 			}
@@ -395,16 +395,7 @@
 						"Action": "s3:GetObject",
 						"Effect": "Allow",
 						"Resource": {
-							"Fn::Join": [
-								"",
-								[
-									"arn:aws:s3:::",
-									{
-										"Ref": "S3BucketName"
-									},
-									"/*"
-								]
-							]
+							"Fn::Sub": "arn:aws:s3:::${S3BucketName}/*"
 						},
 						"Principal": "*"
 					}]
@@ -444,7 +435,7 @@
 					"PolicyDocument": {
 						"Version": "2012-10-17",
 						"Statement": [{
-								"Sid": "VisualEditor0",
+								"Sid": "ManageObjects",
 								"Effect": "Allow",
 								"Action": [
 									"s3:PutObject",
@@ -453,33 +444,13 @@
 									"s3:DeleteObject",
 									"s3:PutObjectAcl"
 								],
-								"Resource": [{
-										"Fn::Join": [
-											"",
-											[
-												"arn:aws:s3:::",
-												{
-													"Ref": "S3BucketName"
-												},
-												"/*"
-											]
-										]
-									},
-									{
-										"Fn::Join": [
-											"",
-											[
-												"arn:aws:s3:::",
-												{
-													"Ref": "S3BucketName"
-												}
-											]
-										]
-									}
+								"Resource": [
+									{ "Fn::Sub": "arn:aws:s3:::${S3BucketName}/*" },
+									{ "Fn::Sub": "arn:aws:s3:::${S3BucketName}" }
 								]
 							},
 							{
-								"Sid": "VisualEditor1",
+								"Sid": "ListBuckets",
 								"Effect": "Allow",
 								"Action": "s3:ListAllMyBuckets",
 								"Resource": "*"
