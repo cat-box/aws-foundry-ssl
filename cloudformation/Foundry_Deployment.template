@@ -7,7 +7,7 @@
 					"Label": {
 						"default": "Base Configuration"
 					},
-					"Parameters": ["AdminUserName", "AdminUserPW", "FoundryDownloadLink", "InstanceKey", "InstanceType", "OptionalFixedIP", "S3BucketName", "UseExistingBucket", "TakeSnapshots", "SnapshotFrequency"]
+					"Parameters": ["AdminUserName", "AdminUserPW", "FoundryDownloadLink", "InstanceKey", "InstanceType", "AMI", "OptionalFixedIP", "S3BucketName", "UseExistingBucket", "TakeSnapshots", "SnapshotFrequency"]
 				},
 				{
 					"Label": {
@@ -110,6 +110,11 @@
 			],
 			"ConstraintDescription": "Must be a valid EC2 instance type."
 		},
+		"AMI": {
+			"Type": "AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>",
+			"Description": "AWS managed ssm path for latest AMI in the CFN Deployment Region. Do not need to pass in a value",
+			"Default": "/aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-x86_64-gp2"
+		},
 		"FullyQualifiedDomainName": {
 			"Description": "This is the name of the domain you have purchased. (e.g. mywebsitename.com).",
 			"Type": "String",
@@ -162,37 +167,6 @@
 			"Description": "This only matters if WebServerBool is set to true, and DomainRegistrar is set to google. If both of these conditions are not true ignore this parameter. Secret for fully qualified domain name dynamic DNS.",
 			"Default": "null",
 			"Type": "String"
-		}
-	},
-	"Mappings": {
-		"AMIRegionMap": {
-			"us-east-1": {
-				"AMILinux": "ami-0c94855ba95c71c99"
-			},
-			"us-east-2":{
-				"AMILinux": "ami-03657b56516ab7912"
-			},
-			"us-west-1": {
-				"AMILinux": "ami-0e4035ae3f70c400f"
-			},
-			"us-west-2": {
-				"AMILinux": "ami-01ce4793a2f45922e"
-			},
-			"ap-southeast-2": {
-				"AMILinux": "ami-0099823645f06b6a1"
-			},
-			"eu-north-1": {
-				"AMILinux": "ami-02511cb3673b49e04"
-			},
-			"eu-west-1": {
-				"AMILinux": "ami-08a2aed6e0a6f9c7d"
-			},
-			"eu-central-1": {
-				"AMILinux": "ami-08c148bb835696b45"
-			},
-			"sa-east-1": {
-				"AMILinux": "ami-02898a1921d38a50b"
-			}
 		}
 	},
 	"Conditions": {
@@ -496,13 +470,7 @@
 					"Ref": "InstanceKey"
 				},
 				"ImageId": {
-					"Fn::FindInMap": [
-						"AMIRegionMap",
-						{
-							"Ref": "AWS::Region"
-						},
-						"AMILinux"
-					]
+					"Ref": "AMI"
 				},
 				"InstanceType": {
 					"Ref": "InstanceType"
