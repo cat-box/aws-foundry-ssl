@@ -1,5 +1,10 @@
 #!/usr/bin/env bash
 
+# This patch is intended to be used on deployments created prior to JANUARY 15TH, 2021
+# Do not use this if you deployed via template v1-6 or later
+#
+# CERTBOT CRONJOB PATCH: fixes the cronjob for certbot auto-renew
+
 SCRIPT_PATH=/foundrycron/reboot_certbot.sh
 CRON_PATH=/var/spool/cron/root
 
