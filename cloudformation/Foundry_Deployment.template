@@ -471,7 +471,7 @@
 								"sudo yum install -y git\n",
 								"cd /\n",
 								"git clone https://github.com/cat-box/aws-foundry-ssl.git\n",
-								"mkdir /foundry /aws-foundry-ssl/variables /foundryssl\n",
+								"mkdir /foundry /aws-foundry-ssl/variables /foundryssl /foundrycron /var/log/foundrycron\n",
 								
 								"echo '#!/bin/bash' >> /aws-foundry-ssl/variables/foundry_variables.sh\n",
 								"echo 'foundry_download_link=", { "Ref": "FoundryDownloadLink" }, "' >> /aws-foundry-ssl/variables/foundry_variables.sh\n",

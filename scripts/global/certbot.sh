@@ -15,9 +15,15 @@ if [[ ${webserver_bool} == 'True' ]]; then
     sudo certbot --agree-tos -n --nginx -d ${fqdn},www.${fqdn} -m ${email} --no-eff-email
 fi
 
+# install nginx certbot plugin
+sudo yum install -y python-certbot-nginx
+
 # configure to autorenew certs
-crontab -l | { cat; echo "@reboot    /usr/bin/certbot renew --quiet"; } | crontab -
-crontab -l | { cat; echo "0 12 * * *     /usr/bin/certbot renew --quiet"; } | crontab -
+crontab -l | { cat; echo "@reboot       /foundrycron/reboot_certbot.sh"; } | crontab -
+crontab -l | { cat; echo "0 12 * * *    certbot renew --nginx --no-self-upgrade --no-random-sleep-on-renew --post-hook \"systemctl restart nginx\" > /var/log/foundrycron/certbot_renew_daily.log 2>&1"; } | crontab -
+echo -e "PATH=/usr/bin:/bin:/usr/sbin\n\n$(cat /var/spool/cron/root)" > /var/spool/cron/root
+
+sudo cp /aws-foundry-ssl/files/certbot/reboot_certbot.sh /foundrycron/reboot_certbot.sh
 
 sudo sed -i -e "s|location / {|include conf.d/drop;\n\n\tlocation / {|g" /etc/nginx/conf.d/foundryvtt.conf
 sudo cp /aws-foundry-ssl/files/nginx/drop /etc/nginx/conf.d/drop
