@@ -467,7 +467,7 @@
 								"AWS_INSTANCE_ID=$(curl http://169.254.169.254/latest/meta-data/instance-id)\n",
 								"ROOT_VOLUME_IDS=$(aws ec2 describe-instances --region $AWS_REGION --instance-id $AWS_INSTANCE_ID --output text --query Reservations[0].Instances[0].BlockDeviceMappings[0].Ebs.VolumeId)\n",
 								"aws ec2 create-tags --resources $ROOT_VOLUME_IDS --region $AWS_REGION --tags Key=Snapshot,Value=true\n",
-								"curl --silent --location https://rpm.nodesource.com/setup_12.x | sudo bash -\n",
+								"curl --silent --location https://rpm.nodesource.com/setup_14.x | sudo bash -\n",
 								"sudo yum install -y git\n",
 								"cd /\n",
 								"git clone https://github.com/cat-box/aws-foundry-ssl.git\n",
