@@ -31,6 +31,9 @@ source /aws-foundry-ssl/scripts/global/nginx.sh
 # set up certificates
 source /aws-foundry-ssl/scripts/global/certbot.sh
 
+# set up sns notifications
+source /aws-foundry-ssl/scripts/features/sns.sh
+
 # clean up install files
 # Do not do this during testing
 chmod 700 /tmp/foundry-setup.log

@@ -11,6 +11,12 @@
 				},
 				{
 					"Label": {
+						"default": "Base Configuration Extras"
+					},
+					"Parameters": ["UseUptimeNotifications", "TextNotifications", "EmailNotifications"]
+				},
+				{
+					"Label": {
 						"default": "SSL Configuration"
 					},
 					"Parameters": ["FullyQualifiedDomainName", "SubdomainName", "DomainRegistrar", "WebServerBool", "Email"]
@@ -67,6 +73,25 @@
 				"Daily",
 				"Weekly"
 			]
+		},
+		"UseUptimeNotifications": {
+			"Description": "If you would like to be notified if your server is active for over 24 hours, set this option to either SMS, Email, or Both. Make sure you have performed the required manual steps first.",
+			"Type": "String",
+			"AllowedValues": [
+				"None",
+				"SMS",
+				"Email",
+				"Both"
+			],
+			"Default": "None"
+		},
+		"TextNotifications": {
+			"Description": "Your phone number INCLUDING the country calling code (e.g. for the U.S. and Canada, +1 123-456-7890 -> +11234567890).",
+			"Type": "String"
+		},
+		"EmailNotifications": {
+			"Description": "Your email address to direct notifications to.",
+			"Type": "String"
 		},
 		"OptionalFixedIP": {
 			"Description": "Allows you to have a dedicated public IP for your instance. This prevents the IP from changing everytime you shutdown the instance. EIPs have a conditional cost. If an EIP is in use, it is free. If the EIP is not in use a minimal cost is applied.",
@@ -190,6 +215,24 @@
 			},
 			"True"
 		]
+		},
+		"CreateSNSText": {
+			"Fn::Or": [
+				{ "Fn::Equals": [{"Ref": "UseUptimeNotifications"}, "SMS"]},
+				{ "Fn::Equals": [{"Ref": "UseUptimeNotifications"}, "Both"]}
+			]
+		},
+		"CreateSNSEmail": {
+			"Fn::Or": [
+				{ "Fn::Equals": [{"Ref": "UseUptimeNotifications"}, "Email"]},
+				{ "Fn::Equals": [{"Ref": "UseUptimeNotifications"}, "Both"]}
+			]	
+		},
+		"CreateSNS": {
+			"Fn::Or": [
+				{ "Condition": "CreateSNSText" },
+				{ "Condition": "CreateSNSEmail" }
+			]
 		},
 		"Route53WebServer": {
 			"Fn::And": [
@@ -376,6 +419,65 @@
 				}
 			}
 		},
+		"SNSTopic": {
+			"Condition": "CreateSNS",
+			"Type": "AWS::SNS::Topic",
+			"Properties": {
+				"DisplayName": "Foundry EC2 Notification",
+				"FifoTopic": false,
+				"TopicName": "FoundryNotification"
+			}
+		},
+		"SNSTopicPolicy": {
+			"Condition": "CreateSNS",
+			"Type": "AWS::SNS::TopicPolicy",
+			"Properties": {
+				"PolicyDocument": {
+					"Id": "FoundryTopicPolicy",
+					"Version": "2012-10-17",
+					"Statement": [{
+						"Sid": "49",
+						"Effect": "Allow",
+						"Principal": {
+							"AWS": {
+								"Fn::GetAtt": ["FoundryUser", "Arn"]
+							}
+						},
+						"Action": "sns:Publish",
+						"Resource": "*"
+					}]
+				},
+				"Topics": [{
+					"Ref": "SNSTopic"
+				}]
+			}
+		},
+		"SNSTextSubscription": {
+			"Condition": "CreateSNSText",
+			"Type": "AWS::SNS::Subscription",
+			"Properties": {
+				"Endpoint": {
+					"Ref": "TextNotifications"
+				},
+				"Protocol": "sms",
+				"TopicArn": {
+					"Ref": "SNSTopic"
+				}
+			}
+		},
+		"SNSEmailSubscription": {
+			"Condition": "CreateSNSEmail",
+			"Type": "AWS::SNS::Subscription",
+			"Properties": {
+				"Endpoint": {
+					"Ref": "EmailNotifications"
+				},
+				"Protocol": "email",
+				"TopicArn": {
+					"Ref": "SNSTopic"
+				}
+			}
+		},
 		"AdminUser": {
 			"Type": "AWS::IAM::User",
 			"Properties": {
@@ -434,6 +536,30 @@
 				}]
 			}
 		},
+		"SNSPolicy": {
+			"Condition": "CreateSNS",
+			"Type": "AWS::IAM::Policy",
+			"Properties": {
+				"PolicyName": "SNSFoundry",
+				"PolicyDocument": {
+					"Version": "2012-10-17",
+					"Statement": [{
+						"Sid": "43",
+						"Effect": "Allow",
+						"Action": "sns:Publish",
+						"Resource": {
+							"Ref": "SNSTopic"
+						}
+					}]
+				},
+				"Roles": [{
+					"Ref": "InstanceRole"
+				}],
+				"Users": [{
+					"Ref": "FoundryUser"
+				}]
+			}
+		},
 		"FoundryServer": {
 			"Type": "AWS::EC2::Instance",
 			"Properties": {
@@ -482,6 +608,7 @@
 								"echo '#!/bin/bash' >> /foundryssl/variables.sh\n",
 								"echo 'foundry_user=foundry' >> /foundryssl/variables.sh\n",
 								"echo 'foundry_home=/foundrydata' >> /foundryssl/variables.sh\n",
+								"echo 'region=", { "Ref": "AWS::Region" }, "' >> /foundryssl/variables/variables.sh\n",
 								"echo 'domain_registrar=", { "Ref": "DomainRegistrar" }, "' >> /foundryssl/variables.sh\n",
 								"echo 'api_key=", { "Ref": "APIKey" }, "' >> /foundryssl/variables.sh\n",
 								"echo 'api_secret=", { "Ref": "APISecret" }, "' >> /foundryssl/variables.sh\n",
@@ -490,7 +617,8 @@
 								"echo 'email=", { "Ref": "Email" }, "' >> /foundryssl/variables.sh\n",
 								"echo 'webserver_bool=", { "Ref": "WebServerBool" }, "' >> /foundryssl/variables.sh\n",
 								"echo 'webserver_user=", { "Ref": "GoogleAPIKey" }, "' >> /foundryssl/variables.sh\n",
-								"echo 'webserver_pass=", { "Ref": "GoogleAPISecret" }, "' >> /foundryssl/variables.sh\n",	
+								"echo 'webserver_pass=", { "Ref": "GoogleAPISecret" }, "' >> /foundryssl/variables.sh\n",
+								"echo 'topic_arn=", { "Ref": "SNSTopic" }, "' >> /foundryssl/variables.sh\n",
 								"sudo chown root:root /foundryssl/variables.sh\n",
 								"sudo chmod 700 /foundryssl/variables.sh\n",
 
