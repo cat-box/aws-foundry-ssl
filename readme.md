@@ -32,3 +32,6 @@ _New features which were added to this project will be automatically configured 
     2. Auto restart of Foundry in an event of crash.
 
     A [patch](https://github.com/cat-box/aws-foundry-ssl/wiki/Patches#rclocal-to-systemd-service) is available to those who deployed using earlier versions of this project. 
+
+5. Text/Email uptime notification system via AWS SNS as a cost-saving measure. <br />
+    **i.e.** receive a notification if your server has been active for over 24 hours.
