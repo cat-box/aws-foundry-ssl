@@ -1,6 +1,6 @@
 {
 	"AWSTemplateFormatVersion": "2010-09-09",
-	"Description": "Automated process to setup foundry exactly as the following guides dictate https://foundry-vtt-community.github.io/wiki/Self-Hosting-on-AWS/ and https://foundryvtt.com/article/nginx/. It also allows for optional snap-shots. Made by Lupert and Cat.",
+	"Description": "Automated process to setup foundry exactly as the following guides dictate https://foundryvtt.wiki/en/setup/hosting/Self-Hosting-on-AWS and https://foundryvtt.com/article/nginx/. It also allows for optional snap-shots. Made by Lupert and Cat.",
 	"Metadata": {
 		"AWS::CloudFormation::Interface": {
 			"ParameterGroups": [{
@@ -443,7 +443,10 @@
 								"Fn::GetAtt": ["FoundryUser", "Arn"]
 							}
 						},
-						"Action": "sns:Publish",
+						"Action": [
+							"sns:Publish",
+							"sns:ListTopics"
+						],
 						"Resource": "*"
 					}]
 				},
@@ -546,7 +549,10 @@
 					"Statement": [{
 						"Sid": "43",
 						"Effect": "Allow",
-						"Action": "sns:Publish",
+						"Action": [
+							"sns:Publish",
+							"sns:ListTopics"
+						],
 						"Resource": {
 							"Ref": "SNSTopic"
 						}
