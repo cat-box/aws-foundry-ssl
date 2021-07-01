@@ -624,7 +624,6 @@
 								"echo 'webserver_bool=", { "Ref": "WebServerBool" }, "' >> /foundryssl/variables.sh\n",
 								"echo 'webserver_user=", { "Ref": "GoogleAPIKey" }, "' >> /foundryssl/variables.sh\n",
 								"echo 'webserver_pass=", { "Ref": "GoogleAPISecret" }, "' >> /foundryssl/variables.sh\n",
-								"echo 'topic_arn=", { "Ref": "SNSTopic" }, "' >> /foundryssl/variables.sh\n",
 								"sudo chown root:root /foundryssl/variables.sh\n",
 								"sudo chmod 700 /foundryssl/variables.sh\n",
 
