@@ -284,421 +284,421 @@
 					}
 				]
 			}
-		}
-	},
-	"SecurityGroupIngressVoice": {
-		"Type": "AWS::EC2::SecurityGroupIngress",
-		"Properties": {
-			"GroupId": {
-				"Fn::GetAtt": [
-					"FoundryServerSG",
-					"GroupId"
-				]
-			},
-			"CidrIp": "0.0.0.0/0",
-			"FromPort": 80,
-			"IpProtocol": "tcp",
-			"ToPort": 80
-		}
-	},
-	"SecurityGroupIngressVoiceRange": {
-		"Type": "AWS::EC2::SecurityGroupIngress",
-		"Properties": {
-			"GroupId": {
-				"Fn::GetAtt": [
-					"FoundryServerSG",
-					"GroupId"
-				]
-			},
-			"CidrIp": "0.0.0.0/0",
-			"FromPort": 49152,
-			"IpProtocol": "tcp",
-			"ToPort": 65535
-		}
-	},
-	"SecurityGroupIngressHTTP": {
-		"Type": "AWS::EC2::SecurityGroupIngress",
-		"Properties": {
-			"GroupId": {
-				"Fn::GetAtt": [
-					"FoundryServerSG",
-					"GroupId"
-				]
-			},
-			"CidrIp": "0.0.0.0/0",
-			"FromPort": 33478,
-			"IpProtocol": "tcp",
-			"ToPort": 33478
-		}
-	},
-	"SecurityGroupIngressHTTPS": {
-		"Type": "AWS::EC2::SecurityGroupIngress",
-		"Properties": {
-			"GroupId": {
-				"Fn::GetAtt": [
-					"FoundryServerSG",
-					"GroupId"
-				]
-			},
-			"CidrIp": "0.0.0.0/0",
-			"FromPort": 443,
-			"IpProtocol": "tcp",
-			"ToPort": 443
-		}
-	},
-	"Route53RSFoundry": {
-		"Type": "AWS::Route53::RecordSet",
-		"Condition": "CreateRoute53",
-		"Properties": {
-			"Name": {
-				"Fn::Sub": "${SubdomainName}.${FullyQualifiedDomainName}"
-			},
-			"Type": "A",
-			"HostedZoneName": {
-				"Fn::Sub": "${FullyQualifiedDomainName}."
-			},
-			"ResourceRecords": [
-				{
+		},
+		"SecurityGroupIngressVoice": {
+			"Type": "AWS::EC2::SecurityGroupIngress",
+			"Properties": {
+				"GroupId": {
 					"Fn::GetAtt": [
-						"FoundryServer",
-						"PublicIp"
+						"FoundryServerSG",
+						"GroupId"
 					]
-				}
-			],
-			"TTL": "60"
-		}
-	},
-	"Route53RSWeb": {
-		"Type": "AWS::Route53::RecordSet",
-		"Condition": "Route53WebServer",
-		"Properties": {
-			"Name": {
-				"Ref": "FullyQualifiedDomainName"
-			},
-			"Type": "A",
-			"HostedZoneName": {
-				"Fn::Sub": "${FullyQualifiedDomainName}."
-			},
-			"ResourceRecords": [
-				{
+				},
+				"CidrIp": "0.0.0.0/0",
+				"FromPort": 80,
+				"IpProtocol": "tcp",
+				"ToPort": 80
+			}
+		},
+		"SecurityGroupIngressVoiceRange": {
+			"Type": "AWS::EC2::SecurityGroupIngress",
+			"Properties": {
+				"GroupId": {
 					"Fn::GetAtt": [
-						"FoundryServer",
-						"PublicIp"
+						"FoundryServerSG",
+						"GroupId"
 					]
-				}
-			],
-			"TTL": "60"
-		}
-	},
-	"Route53RSWebWWW": {
-		"Type": "AWS::Route53::RecordSet",
-		"Condition": "Route53WebServer",
-		"Properties": {
-			"Name": {
-				"Fn::Sub": "www.${FullyQualifiedDomainName}"
-			},
-			"Type": "CNAME",
-			"HostedZoneName": {
-				"Fn::Sub": "${FullyQualifiedDomainName}."
-			},
-			"ResourceRecords": [
-				{
+				},
+				"CidrIp": "0.0.0.0/0",
+				"FromPort": 49152,
+				"IpProtocol": "tcp",
+				"ToPort": 65535
+			}
+		},
+		"SecurityGroupIngressHTTP": {
+			"Type": "AWS::EC2::SecurityGroupIngress",
+			"Properties": {
+				"GroupId": {
+					"Fn::GetAtt": [
+						"FoundryServerSG",
+						"GroupId"
+					]
+				},
+				"CidrIp": "0.0.0.0/0",
+				"FromPort": 33478,
+				"IpProtocol": "tcp",
+				"ToPort": 33478
+			}
+		},
+		"SecurityGroupIngressHTTPS": {
+			"Type": "AWS::EC2::SecurityGroupIngress",
+			"Properties": {
+				"GroupId": {
+					"Fn::GetAtt": [
+						"FoundryServerSG",
+						"GroupId"
+					]
+				},
+				"CidrIp": "0.0.0.0/0",
+				"FromPort": 443,
+				"IpProtocol": "tcp",
+				"ToPort": 443
+			}
+		},
+		"Route53RSFoundry": {
+			"Type": "AWS::Route53::RecordSet",
+			"Condition": "CreateRoute53",
+			"Properties": {
+				"Name": {
+					"Fn::Sub": "${SubdomainName}.${FullyQualifiedDomainName}"
+				},
+				"Type": "A",
+				"HostedZoneName": {
+					"Fn::Sub": "${FullyQualifiedDomainName}."
+				},
+				"ResourceRecords": [
+					{
+						"Fn::GetAtt": [
+							"FoundryServer",
+							"PublicIp"
+						]
+					}
+				],
+				"TTL": "60"
+			}
+		},
+		"Route53RSWeb": {
+			"Type": "AWS::Route53::RecordSet",
+			"Condition": "Route53WebServer",
+			"Properties": {
+				"Name": {
 					"Ref": "FullyQualifiedDomainName"
-				}
-			],
-			"TTL": "60"
-		}
-	},
-	"FoundryBucket": {
-		"Condition": "NoExistingS3",
-		"Type": "AWS::S3::Bucket",
-		"Properties": {
-			"CorsConfiguration": {
-				"CorsRules": [
+				},
+				"Type": "A",
+				"HostedZoneName": {
+					"Fn::Sub": "${FullyQualifiedDomainName}."
+				},
+				"ResourceRecords": [
 					{
-						"AllowedHeaders": [
-							"*"
-						],
-						"AllowedMethods": [
-							"GET",
-							"POST",
-							"HEAD"
-						],
-						"MaxAge": "3000",
-						"AllowedOrigins": [
-							"*"
+						"Fn::GetAtt": [
+							"FoundryServer",
+							"PublicIp"
 						]
 					}
-				]
-			},
-			"AccessControl": "PublicRead",
-			"BucketName": {
-				"Ref": "S3BucketName"
+				],
+				"TTL": "60"
 			}
-		}
-	},
-	"FoundryBucketPolicy": {
-		"Condition": "NoExistingS3",
-		"Type": "AWS::S3::BucketPolicy",
-		"Properties": {
-			"Bucket": {
-				"Ref": "FoundryBucket"
-			},
-			"PolicyDocument": {
-				"Version": "2012-10-17",
-				"Statement": [
+		},
+		"Route53RSWebWWW": {
+			"Type": "AWS::Route53::RecordSet",
+			"Condition": "Route53WebServer",
+			"Properties": {
+				"Name": {
+					"Fn::Sub": "www.${FullyQualifiedDomainName}"
+				},
+				"Type": "CNAME",
+				"HostedZoneName": {
+					"Fn::Sub": "${FullyQualifiedDomainName}."
+				},
+				"ResourceRecords": [
 					{
-						"Sid": "PublicReadGetObject",
-						"Action": "s3:GetObject",
-						"Effect": "Allow",
-						"Resource": {
-							"Fn::Sub": "arn:aws:s3:::${S3BucketName}/*"
-						},
-						"Principal": "*"
+						"Ref": "FullyQualifiedDomainName"
 					}
-				]
+				],
+				"TTL": "60"
 			}
-		}
-	},
-	"AdminUser": {
-		"Type": "AWS::IAM::User",
-		"Properties": {
-			"LoginProfile": {
-				"Password": {
-					"Ref": "AdminUserPW"
-				}
-			},
-			"ManagedPolicyArns": [
-				"arn:aws:iam::aws:policy/AdministratorAccess"
-			],
-			"UserName": {
-				"Ref": "AdminUserName"
-			}
-		}
-	},
-	"UserKey": {
-		"Type": "AWS::IAM::AccessKey",
-		"Properties": {
-			"Status": "Active",
-			"UserName": {
-				"Ref": "FoundryUser"
-			}
-		}
-	},
-	"FoundryUser": {
-		"Type": "AWS::IAM::User",
-		"Properties": {
-			"Policies": [
-				{
-					"PolicyName": "S3Foundry",
-					"PolicyDocument": {
-						"Version": "2012-10-17",
-						"Statement": [
-							{
-								"Sid": "ManageObjects",
-								"Effect": "Allow",
-								"Action": [
-									"s3:PutObject",
-									"s3:GetObject",
-									"s3:ListBucket",
-									"s3:DeleteObject",
-									"s3:PutObjectAcl"
-								],
-								"Resource": [
-									{
-										"Fn::Sub": "arn:aws:s3:::${S3BucketName}/*"
-									},
-									{
-										"Fn::Sub": "arn:aws:s3:::${S3BucketName}"
-									}
-								]
-							},
-							{
-								"Sid": "ListBuckets",
-								"Effect": "Allow",
-								"Action": "s3:ListAllMyBuckets",
-								"Resource": "*"
-							}
-						]
-					}
-				}
-			]
-		}
-	},
-	"FoundryServer": {
-		"Type": "AWS::EC2::Instance",
-		"Metadata": {
-			"AWS::CloudFormation::Init": {
-				"config": {
-					"packages": {
-						"yum": {
-							"git": [],
-							"openssl-devel": [],
-							"awslogs": []
-						}
-					},
-					"users": {
-						"foundry": {
-							"groups": [
-								"foundry"
+		},
+		"FoundryBucket": {
+			"Condition": "NoExistingS3",
+			"Type": "AWS::S3::Bucket",
+			"Properties": {
+				"CorsConfiguration": {
+					"CorsRules": [
+						{
+							"AllowedHeaders": [
+								"*"
 							],
-							"uid": "182",
-							"homeDir": "/home/foundry"
+							"AllowedMethods": [
+								"GET",
+								"POST",
+								"HEAD"
+							],
+							"MaxAge": "3000",
+							"AllowedOrigins": [
+								"*"
+							]
 						}
-					},
-					"sources": {},
-					"files": {
-						"/foundryssl/variables.sh": {
-							"content": {
-								"Fn::Join": [
-									"",
-									[
-										"#!/bin/bash",
-										"\n",
-										"foundry_user=foundry",
-										"\n",
-										"foundry_home=/foundrydata",
-										"\n",
-										"region=",
+					]
+				},
+				"AccessControl": "PublicRead",
+				"BucketName": {
+					"Ref": "S3BucketName"
+				}
+			}
+		},
+		"FoundryBucketPolicy": {
+			"Condition": "NoExistingS3",
+			"Type": "AWS::S3::BucketPolicy",
+			"Properties": {
+				"Bucket": {
+					"Ref": "FoundryBucket"
+				},
+				"PolicyDocument": {
+					"Version": "2012-10-17",
+					"Statement": [
+						{
+							"Sid": "PublicReadGetObject",
+							"Action": "s3:GetObject",
+							"Effect": "Allow",
+							"Resource": {
+								"Fn::Sub": "arn:aws:s3:::${S3BucketName}/*"
+							},
+							"Principal": "*"
+						}
+					]
+				}
+			}
+		},
+		"AdminUser": {
+			"Type": "AWS::IAM::User",
+			"Properties": {
+				"LoginProfile": {
+					"Password": {
+						"Ref": "AdminUserPW"
+					}
+				},
+				"ManagedPolicyArns": [
+					"arn:aws:iam::aws:policy/AdministratorAccess"
+				],
+				"UserName": {
+					"Ref": "AdminUserName"
+				}
+			}
+		},
+		"UserKey": {
+			"Type": "AWS::IAM::AccessKey",
+			"Properties": {
+				"Status": "Active",
+				"UserName": {
+					"Ref": "FoundryUser"
+				}
+			}
+		},
+		"FoundryUser": {
+			"Type": "AWS::IAM::User",
+			"Properties": {
+				"Policies": [
+					{
+						"PolicyName": "S3Foundry",
+						"PolicyDocument": {
+							"Version": "2012-10-17",
+							"Statement": [
+								{
+									"Sid": "ManageObjects",
+									"Effect": "Allow",
+									"Action": [
+										"s3:PutObject",
+										"s3:GetObject",
+										"s3:ListBucket",
+										"s3:DeleteObject",
+										"s3:PutObjectAcl"
+									],
+									"Resource": [
 										{
-											"Ref": "AWS::Region"
+											"Fn::Sub": "arn:aws:s3:::${S3BucketName}/*"
 										},
-										"\n",
-										"domain_registrar=",
 										{
-											"Ref": "DomainRegistrar"
-										},
-										"\n",
-										"api_key=",
-										{
-											"Ref": "APIKey"
-										},
-										"\n",
-										"api_secret=",
-										{
-											"Ref": "APISecret"
-										},
-										"\n",
-										"fqdn=",
-										{
-											"Ref": "FullyQualifiedDomainName"
-										},
-										"\n",
-										"subdomain=",
-										{
-											"Ref": "SubdomainName"
-										},
-										"\n",
-										"email=",
-										{
-											"Ref": "Email"
-										},
-										"\n",
-										"webserver_bool=",
-										{
-											"Ref": "WebServerBool"
-										},
-										"\n",
-										"webserver_user=",
-										{
-											"Ref": "GoogleAPIKey"
-										},
-										"\n",
-										"webserver_pass=",
-										{
-											"Ref": "GoogleAPISecret"
+											"Fn::Sub": "arn:aws:s3:::${S3BucketName}"
 										}
 									]
-								]
-							},
-							"mode": "000700",
-							"owner": "root",
-							"group": "root"
+								},
+								{
+									"Sid": "ListBuckets",
+									"Effect": "Allow",
+									"Action": "s3:ListAllMyBuckets",
+									"Resource": "*"
+								}
+							]
+						}
+					}
+				]
+			}
+		},
+		"FoundryServer": {
+			"Type": "AWS::EC2::Instance",
+			"Metadata": {
+				"AWS::CloudFormation::Init": {
+					"config": {
+						"packages": {
+							"yum": {
+								"git": [],
+								"openssl-devel": [],
+								"awslogs": []
+							}
 						},
-						"/foundryssl/variables_temp.sh": {
-							"content": {
-								"Fn::Join": [
-									"",
-									[
-										"#!/bin/bash",
-										"\n",
-										"foundry_download_link=",
-										{
-											"Ref": "FoundryDownloadLink"
-										},
-										"\n",
-										"access_key_id=",
-										{
-											"Ref": "UserKey"
-										},
-										"\n",
-										"secret_access_key=",
-										{
-											"Fn::GetAtt": [
-												"UserKey",
-												"SecretAccessKey"
-											]
-										}
+						"users": {
+							"foundry": {
+								"groups": [
+									"foundry"
+								],
+								"uid": "182",
+								"homeDir": "/home/foundry"
+							}
+						},
+						"sources": {},
+						"files": {
+							"/foundryssl/variables.sh": {
+								"content": {
+									"Fn::Join": [
+										"",
+										[
+											"#!/bin/bash",
+											"\n",
+											"foundry_user=foundry",
+											"\n",
+											"foundry_home=/foundrydata",
+											"\n",
+											"region=",
+											{
+												"Ref": "AWS::Region"
+											},
+											"\n",
+											"domain_registrar=",
+											{
+												"Ref": "DomainRegistrar"
+											},
+											"\n",
+											"api_key=",
+											{
+												"Ref": "APIKey"
+											},
+											"\n",
+											"api_secret=",
+											{
+												"Ref": "APISecret"
+											},
+											"\n",
+											"fqdn=",
+											{
+												"Ref": "FullyQualifiedDomainName"
+											},
+											"\n",
+											"subdomain=",
+											{
+												"Ref": "SubdomainName"
+											},
+											"\n",
+											"email=",
+											{
+												"Ref": "Email"
+											},
+											"\n",
+											"webserver_bool=",
+											{
+												"Ref": "WebServerBool"
+											},
+											"\n",
+											"webserver_user=",
+											{
+												"Ref": "GoogleAPIKey"
+											},
+											"\n",
+											"webserver_pass=",
+											{
+												"Ref": "GoogleAPISecret"
+											}
+										]
 									]
-								]
+								},
+								"mode": "000700",
+								"owner": "root",
+								"group": "root"
 							},
-							"mode": "000700",
-							"owner": "root",
-							"group": "root"
-						},
-						"/etc/awslogs/awslogs.conf": {
-							"content": {
-								"Fn::Join": [
-									"",
-									[
-										"[/tmp/foundry-setup.log]\n",
-										"datetime_format = %b %d %H:%M:%S\n",
-										"file = /tmp/foundry-setup.log\n",
-										"log_stream_name = {instance_id}\n",
-										"initial_position = start_of_file\n",
-										"log_group_name = /tmp/foundry-setup.log\n"
+							"/foundryssl/variables_temp.sh": {
+								"content": {
+									"Fn::Join": [
+										"",
+										[
+											"#!/bin/bash",
+											"\n",
+											"foundry_download_link=",
+											{
+												"Ref": "FoundryDownloadLink"
+											},
+											"\n",
+											"access_key_id=",
+											{
+												"Ref": "UserKey"
+											},
+											"\n",
+											"secret_access_key=",
+											{
+												"Fn::GetAtt": [
+													"UserKey",
+													"SecretAccessKey"
+												]
+											}
+										]
 									]
-								]
+								},
+								"mode": "000700",
+								"owner": "root",
+								"group": "root"
 							},
-							"mode": "000700",
-							"owner": "root",
-							"group": "root"
-						},
-						"commands": {
-							"Start_CW_Logger": {
-								"command": "systemctl start awslogsdShit "
+							"/etc/awslogs/awslogs.conf": {
+								"content": {
+									"Fn::Join": [
+										"",
+										[
+											"[/tmp/foundry-setup.log]\n",
+											"datetime_format = %b %d %H:%M:%S\n",
+											"file = /tmp/foundry-setup.log\n",
+											"log_stream_name = {instance_id}\n",
+											"initial_position = start_of_file\n",
+											"log_group_name = /tmp/foundry-setup.log\n"
+										]
+									]
+								},
+								"mode": "000700",
+								"owner": "root",
+								"group": "root"
 							},
-							"Get_Variables_Temp": {
-								"command": "sh /foundryssl/variables_temp.sh"
-							},
-							"Get_Variables_Perm": {
-								"command": "sh /foundryssl/variables.sh"
-							},
-							"Get_Inst_ID": {
-								"command": "AWS_INSTANCE_ID=$(curl http://169.254.169.254/latest/meta-data/instance-id)"
-							},
-							"Get_Vol_ID": {
-								"command": "ROOT_VOLUME_IDS=$(aws ec2 describe-instances --region ${region} --instance-id $AWS_INSTANCE_ID --output text --query Reservations[0].Instances[0].BlockDeviceMappings[0].Ebs.VolumeId)"
-							},
-							"Create_Vol_Tag": {
-								"command": "aws ec2 create-tags --resources ${ROOT_VOLUME_IDS} --region ${region} --tags Key=Snapshot,Value=true"
-							},
-							"Install_Nodejs_14": {
-								"command": "curl --silent --location https://rpm.nodesource.com/setup_14.x | sudo bash"
-							},
-							"Install_Nodejs_14_cont": {
-								"command": "yum install -y nodejs`"
-							},
-							"Make_Dirs": {
-								"command": "mkdir /foundrycron /var/log/foundrycron /home/foundry/foundry-install /foundrydata"
-							},
-							"Git_Clone": {
-								"command": "git clone https://github.com/cat-box/aws-foundry-ssl.git",
-								"cwd": "/"
-							},
-							"Start_Install": {
-								"command": "/aws-foundry-ssl/scripts/global/install.sh",
-								"cwd": "/"
+							"commands": {
+								"Start_CW_Logger": {
+									"command": "systemctl start awslogsdShit "
+								},
+								"Get_Variables_Temp": {
+									"command": "sh /foundryssl/variables_temp.sh"
+								},
+								"Get_Variables_Perm": {
+									"command": "sh /foundryssl/variables.sh"
+								},
+								"Get_Inst_ID": {
+									"command": "AWS_INSTANCE_ID=$(curl http://169.254.169.254/latest/meta-data/instance-id)"
+								},
+								"Get_Vol_ID": {
+									"command": "ROOT_VOLUME_IDS=$(aws ec2 describe-instances --region ${region} --instance-id $AWS_INSTANCE_ID --output text --query Reservations[0].Instances[0].BlockDeviceMappings[0].Ebs.VolumeId)"
+								},
+								"Create_Vol_Tag": {
+									"command": "aws ec2 create-tags --resources ${ROOT_VOLUME_IDS} --region ${region} --tags Key=Snapshot,Value=true"
+								},
+								"Install_Nodejs_14": {
+									"command": "curl --silent --location https://rpm.nodesource.com/setup_14.x | sudo bash"
+								},
+								"Install_Nodejs_14_cont": {
+									"command": "yum install -y nodejs`"
+								},
+								"Make_Dirs": {
+									"command": "mkdir /foundrycron /var/log/foundrycron /home/foundry/foundry-install /foundrydata"
+								},
+								"Git_Clone": {
+									"command": "git clone --branch dev https://github.com/cat-box/aws-foundry-ssl.git",
+									"cwd": "/"
+								},
+								"Start_Install": {
+									"command": "/aws-foundry-ssl/scripts/global/install.sh",
+									"cwd": "/"
+								}
 							}
 						}
 					}
