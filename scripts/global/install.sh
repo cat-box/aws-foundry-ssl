@@ -3,7 +3,7 @@ exec > /tmp/foundry-setup.log 2>&1
 set -x
 
 source /foundryssl/variables.sh
-source /aws-foundry-ssl/variables/foundry_variables.sh
+source /foundryssl/variables_temp.sh
 
 case ${domain_registrar} in
     amazon)
@@ -34,6 +34,7 @@ source /aws-foundry-ssl/scripts/global/certbot.sh
 # clean up install files
 # Do not do this during testing
 chmod 700 /tmp/foundry-setup.log
-sudo rm -r /aws-foundry-ssl
+sudo rm -r /aws-foundry-ssl 
+sudo rm /foundryssl/variables_temp.sh
 
 reboot now

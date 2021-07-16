@@ -1,15 +1,15 @@
 #!/bin/bash
 
 # grab variables
-source /aws-foundry-ssl/variables/foundry_variables.sh
+source /foundryssl/variables_temp.sh
 source /foundryssl/variables.sh
 
-# install packages for foundry
-sudo yum install -y nodejs
-sudo yum install -y openssl-devel
+# install packages for foundry NOT NEEDED
+#sudo yum install -y nodejs
+#sudo yum install -y openssl-devel
 
 # download foundry from patreon link or google drive
-cd /foundry
+cd /home/foundry/foundry-install
 if [[ `echo ${foundry_download_link}  | cut -d '/' -f3` == 'drive.google.com' ]]
 then
     fileid=`echo ${foundry_download_link} | cut -d '/' -f6`
@@ -22,6 +22,7 @@ fi
 unzip -u foundry.zip
 rm foundry.zip
 
+chown -R foundry:foundry /home/foundry/ /foundrydata
 # start foundry and add to boot
 sudo cp /aws-foundry-ssl/files/foundry/foundry.service /etc/systemd/system/foundry.service
 sudo chmod 644 /etc/systemd/system/foundry.service
