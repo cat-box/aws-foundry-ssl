@@ -661,6 +661,8 @@
 									"Fn::Join": [
 										"",
 										[
+											"[general]\n",
+											"state_file = /var/lib/awslogs/agent-state\n\n",
 											"[/tmp/foundry-setup.log]\n",
 											"datetime_format = %b %d %H:%M:%S\n",
 											"file = /tmp/foundry-setup.log\n",
@@ -695,6 +697,9 @@
 							"Start_Install": {
 								"command": "sh /aws-foundry-ssl/scripts/global/install.sh",
 								"cwd": "/"
+							},
+							"Give_Ec2_User_Access": {
+								"command": "usermod -a -G foundry ec2-user"
 							}
 						}
 					}
