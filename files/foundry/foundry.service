@@ -4,7 +4,7 @@ After=network.target
 
 [Service]
 Environment=NODE_PORT=30000
-WorkingDirectory=/foundry/resources/app
+WorkingDirectory=/home/foundry/foundry-install/resources/app/
 Type=simple
 User=foundry
 ExecStart=/usr/bin/node /home/foundry/foundry-install/resources/app/main.js --dataPath=/foundrydata

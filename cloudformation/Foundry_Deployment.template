@@ -345,6 +345,21 @@
 				"ToPort": 443
 			}
 		},
+		"SecurityGroupIngressSSH": {
+			"Type": "AWS::EC2::SecurityGroupIngress",
+			"Properties": {
+				"GroupId": {
+					"Fn::GetAtt": [
+						"FoundryServerSG",
+						"GroupId"
+					]
+				},
+				"CidrIp": "0.0.0.0/0",
+				"FromPort": 22,
+				"IpProtocol": "tcp",
+				"ToPort": 22
+			}
+		},
 		"Route53RSFoundry": {
 			"Type": "AWS::Route53::RecordSet",
 			"Condition": "CreateRoute53",
@@ -664,21 +679,6 @@
 							"Start_CW_Logger": {
 								"command": "systemctl start awslogsd"
 							},
-							"Get_Variables_Perm": {
-								"command": "AWS_AVAIL_ZONE=$(curl http://169.254.169.254/latest/meta-data/placement/availability-zone)"
-							},
-							"Get_Variables_Perm": {
-								"command": "AWS_REGION=${AWS_AVAIL_ZONE::-1}"
-							},
-							"Get_Inst_ID": {
-								"command": "AWS_INSTANCE_ID=$(curl http://169.254.169.254/latest/meta-data/instance-id)"
-							},
-							"Get_Vol_ID": {
-								"command": "ROOT_VOLUME_IDS=$(aws ec2 describe-instances --region $AWS_REGION --instance-id $AWS_INSTANCE_ID --output text --query Reservations[0].Instances[0].BlockDeviceMappings[0].Ebs.VolumeId)"
-							},
-							"Create_Vol_Tag": {
-								"command": "aws ec2 create-tags --resources ${ROOT_VOLUME_IDS} --region $AWS_REGION --tags Key=Snapshot,Value=true"
-							},
 							"Install_Nodejs_14": {
 								"command": "curl --silent --location https://rpm.nodesource.com/setup_14.x | sudo bash"
 							},
@@ -730,6 +730,12 @@
 							"",
 							[
 								"#!/bin/bash -x\n",
+								"#Could not get this to work in cfn-init\n",
+								"AWS_AVAIL_ZONE=$(curl http://169.254.169.254/latest/meta-data/placement/availability-zone)\n",
+								"AWS_REGION=${AWS_AVAIL_ZONE::-1}\n",
+								"AWS_INSTANCE_ID=$(curl http://169.254.169.254/latest/meta-data/instance-id)\n",
+								"ROOT_VOLUME_IDS=$(aws ec2 describe-instances --region $AWS_REGION --instance-id $AWS_INSTANCE_ID --output text --query Reservations[0].Instances[0].BlockDeviceMappings[0].Ebs.VolumeId)\n",
+								"aws ec2 create-tags --resources ${ROOT_VOLUME_IDS} --region $AWS_REGION --tags Key=Snapshot,Value=true\n",
 								"# Install the files and packages from the metadata\n",
 								"/opt/aws/bin/cfn-init -v ",
 								"         --stack ",
