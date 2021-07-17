@@ -16,6 +16,7 @@
 						"InstanceType",
 						"AMI",
 						"OptionalFixedIP",
+						"OptionalSshAccess",
 						"S3BucketName",
 						"UseExistingBucket",
 						"TakeSnapshots",
@@ -83,6 +84,12 @@
 			"ConstraintDescription": "This must be globally unique across all of AWS, so be a little creative. Must be all lowercase letters or numbers, no spaces, and no symbols expect dash (-).",
 			"Type": "String",
 			"AllowedPattern": "^[a-z|0-9]+(-[a-z|0-9]+)*$"
+		},
+		"OptionalSshAccess": {
+			"Description": "Will create a rulle allowing TCP port 22 inbound for the given IP Range. You MUST enter a range. For a single IP put /32 at the end. You will want to use your public IP (https://www.whatsmyip.org/). Example of a valid entry: 123.1.2.3/32. If you are not using this feature, leave this value blank and no SSH rule will be configured.",
+			"Type": "String",
+			"Default": "",
+			"ConstraintDescription": "Must be a valid IP/CIDR range."
 		},
 		"SnapshotFrequency": {
 			"Description": "Decides how often you want to take snapshots. This value does not matter if you select False for TakeSnapshots",
@@ -201,6 +208,18 @@
 					"Ref": "TakeSnapshots"
 				},
 				"True"
+			]
+		},
+		"HasSshIP": {
+			"Fn::Not": [
+				{
+					"Fn::Equals": [
+						"",
+						{
+							"Ref": "OptionalSshAccess"
+						}
+					]
+				}
 			]
 		},
 		"CreateRoute53": {
@@ -347,6 +366,7 @@
 		},
 		"SecurityGroupIngressSSH": {
 			"Type": "AWS::EC2::SecurityGroupIngress",
+			"Condition": "HasSshIP",
 			"Properties": {
 				"GroupId": {
 					"Fn::GetAtt": [
@@ -354,7 +374,9 @@
 						"GroupId"
 					]
 				},
-				"CidrIp": "0.0.0.0/0",
+				"CidrIp": {
+					"Ref": "OptionalSshAccess"
+				},
 				"FromPort": 22,
 				"IpProtocol": "tcp",
 				"ToPort": 22
@@ -719,6 +741,9 @@
 							},
 							"Give_Ec2_User_Access": {
 								"command": "usermod -a -G foundry ec2-user"
+							},
+							"CW_Logs_Retention": {
+								"command": "aws logs put-retention-policy --log-group-name Foundry-SSL-Logs --retention-in-days 14"
 							}
 						}
 					}
@@ -773,7 +798,7 @@
 								},
 								"\n",
 								"# Signal the status from cfn-init\n",
-								"/opt/aws/bin/cfn-signal -e $? ",
+								"/opt/aws/bin/cfn-signal -e 0 ",
 								"         --stack ",
 								{
 									"Ref": "AWS::StackName"
