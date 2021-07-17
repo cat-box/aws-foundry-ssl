@@ -664,11 +664,30 @@
 											"[general]\n",
 											"state_file = /var/lib/awslogs/agent-state\n\n",
 											"[/tmp/foundry-setup.log]\n",
-											"datetime_format = %b %d %H:%M:%S\n",
-											"file = /tmp/foundry-setup.log\n",
+											"file = /tmp/foundry-setup.log \n",
 											"log_stream_name = {instance_id}\n",
 											"initial_position = start_of_file\n",
-											"log_group_name = /tmp/foundry-setup.log\n"
+											"log_group_name = Foundry-SSL-Logs\n"
+										]
+									]
+								},
+								"mode": "000700",
+								"owner": "root",
+								"group": "root"
+							},
+							"/etc/awslogs/awscli.conf": {
+								"content": {
+									"Fn::Join": [
+										"",
+										[
+											"[plugins]\n",
+											"cwlogs = cwlogs\n",
+											"[/tmp/foundry-setup.log]\n",
+											"[default]\n",
+											"region = ",
+											{
+												"Ref": "AWS::Region"
+											}
 										]
 									]
 								},
