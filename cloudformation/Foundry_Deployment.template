@@ -538,14 +538,10 @@
 						},
 						"users": {
 							"foundry": {
-								"groups": [
-									"foundry"
-								],
 								"uid": "182",
 								"homeDir": "/home/foundry"
 							}
 						},
-						"sources": {},
 						"files": {
 							"/foundryssl/variables.sh": {
 								"content": {
@@ -662,43 +658,43 @@
 								"mode": "000700",
 								"owner": "root",
 								"group": "root"
+							}
+						},
+						"commands": {
+							"Start_CW_Logger": {
+								"command": "systemctl start awslogsd"
 							},
-							"commands": {
-								"Start_CW_Logger": {
-									"command": "systemctl start awslogsdShit "
-								},
-								"Get_Variables_Temp": {
-									"command": "sh /foundryssl/variables_temp.sh"
-								},
-								"Get_Variables_Perm": {
-									"command": "sh /foundryssl/variables.sh"
-								},
-								"Get_Inst_ID": {
-									"command": "AWS_INSTANCE_ID=$(curl http://169.254.169.254/latest/meta-data/instance-id)"
-								},
-								"Get_Vol_ID": {
-									"command": "ROOT_VOLUME_IDS=$(aws ec2 describe-instances --region ${region} --instance-id $AWS_INSTANCE_ID --output text --query Reservations[0].Instances[0].BlockDeviceMappings[0].Ebs.VolumeId)"
-								},
-								"Create_Vol_Tag": {
-									"command": "aws ec2 create-tags --resources ${ROOT_VOLUME_IDS} --region ${region} --tags Key=Snapshot,Value=true"
-								},
-								"Install_Nodejs_14": {
-									"command": "curl --silent --location https://rpm.nodesource.com/setup_14.x | sudo bash"
-								},
-								"Install_Nodejs_14_cont": {
-									"command": "yum install -y nodejs`"
-								},
-								"Make_Dirs": {
-									"command": "mkdir /foundrycron /var/log/foundrycron /home/foundry/foundry-install /foundrydata"
-								},
-								"Git_Clone": {
-									"command": "git clone --branch dev https://github.com/cat-box/aws-foundry-ssl.git",
-									"cwd": "/"
-								},
-								"Start_Install": {
-									"command": "/aws-foundry-ssl/scripts/global/install.sh",
-									"cwd": "/"
-								}
+							"Get_Variables_Perm": {
+								"command": "AWS_AVAIL_ZONE=$(curl http://169.254.169.254/latest/meta-data/placement/availability-zone)"
+							},
+							"Get_Variables_Perm": {
+								"command": "AWS_REGION=${AWS_AVAIL_ZONE::-1}"
+							},
+							"Get_Inst_ID": {
+								"command": "AWS_INSTANCE_ID=$(curl http://169.254.169.254/latest/meta-data/instance-id)"
+							},
+							"Get_Vol_ID": {
+								"command": "ROOT_VOLUME_IDS=$(aws ec2 describe-instances --region $AWS_REGION --instance-id $AWS_INSTANCE_ID --output text --query Reservations[0].Instances[0].BlockDeviceMappings[0].Ebs.VolumeId)"
+							},
+							"Create_Vol_Tag": {
+								"command": "aws ec2 create-tags --resources ${ROOT_VOLUME_IDS} --region $AWS_REGION --tags Key=Snapshot,Value=true"
+							},
+							"Install_Nodejs_14": {
+								"command": "curl --silent --location https://rpm.nodesource.com/setup_14.x | sudo bash"
+							},
+							"Install_Nodejs_14_cont": {
+								"command": "yum install -y nodejs"
+							},
+							"Make_Dirs": {
+								"command": "mkdir -p /foundrycron /var/log/foundrycron /home/foundry/foundry-install /foundrydata"
+							},
+							"Git_Clone": {
+								"command": "git clone --branch dev https://github.com/cat-box/aws-foundry-ssl.git",
+								"cwd": "/"
+							},
+							"Start_Install": {
+								"command": "sh /aws-foundry-ssl/scripts/global/install.sh",
+								"cwd": "/"
 							}
 						}
 					}

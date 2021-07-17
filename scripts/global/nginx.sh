@@ -8,6 +8,9 @@ else
     foundry_file="foundryvtt.conf"
 fi
 
+# install nginx
+sudo amazon-linux-extras install -y nginx1
+
 # configure nginx
 sudo mkdir /var/log/nginx/foundry
 sudo cp /aws-foundry-ssl/files/nginx/${foundry_file} /etc/nginx/conf.d/foundryvtt.conf
