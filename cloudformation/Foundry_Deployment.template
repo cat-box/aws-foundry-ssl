@@ -719,30 +719,30 @@
 							}
 						},
 						"commands": {
-							"Start_CW_Logger": {
+							"A_Start_CW_Logger": {
 								"command": "systemctl start awslogsd"
 							},
-							"Install_Nodejs_14": {
+							"B_Install_Nodejs_14": {
 								"command": "curl --silent --location https://rpm.nodesource.com/setup_14.x | sudo bash"
 							},
-							"Install_Nodejs_14_cont": {
+							"C_Install_Nodejs_14_cont": {
 								"command": "yum install -y nodejs"
 							},
-							"Make_Dirs": {
+							"D_Make_Dirs": {
 								"command": "mkdir -p /foundrycron /var/log/foundrycron /home/foundry/foundry-install /foundrydata"
 							},
-							"Git_Clone": {
+							"E_Git_Clone": {
 								"command": "git clone --branch dev https://github.com/cat-box/aws-foundry-ssl.git",
 								"cwd": "/"
 							},
-							"Start_Install": {
+							"F_Start_Install": {
 								"command": "sh /aws-foundry-ssl/scripts/global/install.sh",
 								"cwd": "/"
 							},
-							"Give_Ec2_User_Access": {
+							"G_Give_Ec2_User_Access": {
 								"command": "usermod -a -G foundry ec2-user"
 							},
-							"CW_Logs_Retention": {
+							"H_CW_Logs_Retention": {
 								"command": "aws --region $AWS_REGION logs put-retention-policy --log-group-name Foundry-SSL-Logs --retention-in-days 14"
 							}
 						}
