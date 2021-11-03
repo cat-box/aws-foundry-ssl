@@ -743,7 +743,7 @@
 								"command": "usermod -a -G foundry ec2-user"
 							},
 							"CW_Logs_Retention": {
-								"command": "aws logs put-retention-policy --log-group-name Foundry-SSL-Logs --retention-in-days 14"
+								"command": "aws --region $AWS_REGION logs put-retention-policy --log-group-name Foundry-SSL-Logs --retention-in-days 14"
 							}
 						}
 					}
@@ -798,7 +798,7 @@
 								},
 								"\n",
 								"# Signal the status from cfn-init\n",
-								"/opt/aws/bin/cfn-signal -e 0 ",
+								"/opt/aws/bin/cfn-signal -e $? ",
 								"         --stack ",
 								{
 									"Ref": "AWS::StackName"
@@ -852,7 +852,8 @@
 										"logs:CreateLogGroup",
 										"logs:CreateLogStream",
 										"logs:PutLogEvents",
-										"logs:DescribeLogStreams"
+										"logs:DescribeLogStreams",
+										"logs:PutRetentionPolicy"
 									],
 									"Resource": "*"
 								}
