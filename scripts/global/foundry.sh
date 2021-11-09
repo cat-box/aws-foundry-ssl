@@ -31,12 +31,22 @@ sudo systemctl enable foundry
 sleep 10s
 
 # configure foundry aws json file
-sudo cp /aws-foundry-ssl/files/foundry/options.json /foundrydata/Config/options.json
-sudo cp /aws-foundry-ssl/files/foundry/AWS.json /foundrydata/Config/AWS.json
-sudo sed -i "s|ACCESSKEYIDHERE|${access_key_id}|g" /foundrydata/Config/AWS.json
-sudo sed -i "s|SECRETACCESSKEYHERE|${secret_access_key}|g" /foundrydata/Config/AWS.json
-sudo sed -i "s|REGIONHERE|${region}|g" /foundrydata/Config/AWS.json
-
+F_DIR='/foundrydata/Config/'
+echo "Start time: $(date +%s)"
+while : ; do
+    if [ -d $F_DIR ]; then 
+        echo "Directory found time: $(date +%s)"
+        sudo cp /aws-foundry-ssl/files/foundry/options.json /foundrydata/Config/options.json
+        sudo cp /aws-foundry-ssl/files/foundry/AWS.json /foundrydata/Config/AWS.json
+        sudo sed -i "s|ACCESSKEYIDHERE|${access_key_id}|g" /foundrydata/Config/AWS.json
+        sudo sed -i "s|SECRETACCESSKEYHERE|${secret_access_key}|g" /foundrydata/Config/AWS.json
+        sudo sed -i "s|REGIONHERE|${region}|g" /foundrydata/Config/AWS.json
+        break
+    else 
+        echo  echo "Directory not found time: $(date +%s)"
+        sleep 1s
+    fi
+done
 # configure foundry options file
 sudo sed -i 's|"awsConfig":.*|"awsConfig": "/foundrydata/Config/AWS.json",|g' /foundrydata/Config/options.json
 
