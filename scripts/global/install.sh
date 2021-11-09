@@ -37,4 +37,5 @@ chmod 700 /tmp/foundry-setup.log
 sudo rm -r /aws-foundry-ssl 
 sudo rm /foundryssl/variables_temp.sh
 
-reboot now
+#Restart Foundry So AWS.json is fully loaded
+sudo systemctl restart foundry
