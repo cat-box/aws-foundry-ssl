@@ -654,11 +654,11 @@
 										[
 											"#!/bin/bash",
 											"\n",
-											"foundry_download_link=",
+											"foundry_download_link='",
 											{
 												"Ref": "FoundryDownloadLink"
 											},
-											"\n",
+											"'\n",
 											"access_key_id=",
 											{
 												"Ref": "UserKey"
