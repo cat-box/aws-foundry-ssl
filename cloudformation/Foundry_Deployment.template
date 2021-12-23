@@ -803,7 +803,7 @@
 								{
 									"Ref": "AWS::StackName"
 								},
-								"         --resource MyInstance ",
+								"         --resource FoundryServer ",
 								"         --region ",
 								{
 									"Ref": "AWS::Region"
