@@ -3,7 +3,8 @@
 	"Description": "Automated process to setup foundry exactly as the following guides dictate https://foundry-vtt-community.github.io/wiki/Self-Hosting-on-AWS/ and https://foundryvtt.com/article/nginx/. It also allows for optional snap-shots. Made by Lupert and Cat.",
 	"Metadata": {
 		"AWS::CloudFormation::Interface": {
-			"ParameterGroups": [{
+			"ParameterGroups": [
+				{
 					"Label": {
 						"default": "Base Configuration"
 					},
@@ -202,7 +203,8 @@
 	},
 	"Conditions": {
 		"CreateSnapshots": {
-			"Fn::Equals": [{
+			"Fn::Equals": [
+				{
 					"Ref": "TakeSnapshots"
 				},
 				"True"
@@ -219,7 +221,8 @@
 			}]
 		},
 		"CreateRoute53": {
-			"Fn::Equals": [{
+			"Fn::Equals": [
+				{
 					"Ref": "DomainRegistrar"
 				},
 				"amazon"
@@ -242,35 +245,40 @@
 			]
 		},
 		"NoExistingS3": {
-			"Fn::Equals": [{
+			"Fn::Equals": [
+				{
 					"Ref": "UseExistingBucket"
 				},
 				"False"
 			]
 		},
 		"CreateEIP": {
-			"Fn::Equals": [{
+			"Fn::Equals": [
+				{
 					"Ref": "OptionalFixedIP"
 				},
 				"True"
 			]
 		},
 		"DailyCheck": {
-			"Fn::Equals": [{
+			"Fn::Equals": [
+				{
 					"Ref": "SnapshotFrequency"
 				},
 				"Daily"
 			]
 		},
 		"WeeklyCheck": {
-			"Fn::Equals": [{
+			"Fn::Equals": [
+				{
 					"Ref": "SnapshotFrequency"
 				},
 				"Weekly"
 			]
 		},
 		"TakeSnapshots": {
-			"Fn::Equals": [{
+			"Fn::Equals": [
+				{
 					"Ref": "TakeSnapshots"
 				},
 				"True"
@@ -282,12 +290,14 @@
 			"Type": "AWS::EC2::SecurityGroup",
 			"Properties": {
 				"GroupDescription": "-",
-				"SecurityGroupIngress": [{
-					"IpProtocol": "tcp",
-					"FromPort": 30000,
-					"ToPort": 30000,
-					"CidrIp": "0.0.0.0/0"
-				}]
+				"SecurityGroupIngress": [
+					{
+						"IpProtocol": "tcp",
+						"FromPort": 30000,
+						"ToPort": 30000,
+						"CidrIp": "0.0.0.0/0"
+					}
+				]
 			}
 		},
 		"SecurityGroupIngressVoice": {
@@ -460,15 +470,17 @@
 				},
 				"PolicyDocument": {
 					"Version": "2012-10-17",
-					"Statement": [{
-						"Sid": "PublicReadGetObject",
-						"Action": "s3:GetObject",
-						"Effect": "Allow",
-						"Resource": {
-							"Fn::Sub": "arn:aws:s3:::${S3BucketName}/*"
-						},
-						"Principal": "*"
-					}]
+					"Statement": [
+						{
+							"Sid": "PublicReadGetObject",
+							"Action": "s3:GetObject",
+							"Effect": "Allow",
+							"Resource": {
+								"Fn::Sub": "arn:aws:s3:::${S3BucketName}/*"
+							},
+							"Principal": "*"
+						}
+					]
 				}
 			}
 		},
@@ -530,7 +542,7 @@
 							}
 						]
 					}
-				}]
+				]
 			}
 		},
 		"FoundryServer": {
@@ -740,13 +752,17 @@
 				"IamInstanceProfile": {
 					"Ref": "InstanceProfile"
 				},
-				"SecurityGroupIds": [{
-					"Ref": "FoundryServerSG"
-				}],
-				"Tags": [{
-					"Key": "Name",
-					"Value": "FoundryServer"
-				}],
+				"SecurityGroupIds": [
+					{
+						"Ref": "FoundryServerSG"
+					}
+				],
+				"Tags": [
+					{
+						"Key": "Name",
+						"Value": "FoundryServer"
+					}
+				],
 				"UserData": {
 					"Fn::Base64": {
 						"Fn::Join": [
@@ -794,11 +810,16 @@
 			"Properties": {
 				"AssumeRolePolicyDocument": {
 					"Version": "2012-10-17",
-					"Statement": [{
-						"Effect": "Allow",
-						"Principal": {
-							"Service": [
-								"ec2.amazonaws.com"
+					"Statement": [
+						{
+							"Effect": "Allow",
+							"Principal": {
+								"Service": [
+									"ec2.amazonaws.com"
+								]
+							},
+							"Action": [
+								"sts:AssumeRole"
 							]
 						},
 						"Action": [
@@ -828,15 +849,17 @@
 							"Resource": "*"
 						}]
 					}
-				}]
+				]
 			}
 		},
 		"InstanceProfile": {
 			"Type": "AWS::IAM::InstanceProfile",
 			"Properties": {
-				"Roles": [{
-					"Ref": "InstanceRole"
-				}]
+				"Roles": [
+					{
+						"Ref": "InstanceRole"
+					}
+				]
 			}
 		},
 		"InstanceEIP": {
@@ -865,35 +888,39 @@
 					"ResourceTypes": [
 						"VOLUME"
 					],
-					"TargetTags": [{
-						"Key": "Snapshot",
-						"Value": "true"
-					}],
-					"Schedules": [{
-						"Fn::If": [
-							"DailyCheck",
-							{
-								"Name": "Snapshots",
-								"CreateRule": {
-									"CronExpression": "cron(0 12 * * ? *)"
+					"TargetTags": [
+						{
+							"Key": "Snapshot",
+							"Value": "true"
+						}
+					],
+					"Schedules": [
+						{
+							"Fn::If": [
+								"DailyCheck",
+								{
+									"Name": "Snapshots",
+									"CreateRule": {
+										"CronExpression": "cron(0 12 * * ? *)"
+									},
+									"RetainRule": {
+										"Count": 5
+									},
+									"CopyTags": true
 								},
-								"RetainRule": {
-									"Count": 5
-								},
-								"CopyTags": true
-							},
-							{
-								"Name": "Snapshots",
-								"CreateRule": {
-									"CronExpression": "cron(0 12 ? * 2 *)"
-								},
-								"RetainRule": {
-									"Count": 5
-								},
-								"CopyTags": true
-							}
-						]
-					}]
+								{
+									"Name": "Snapshots",
+									"CreateRule": {
+										"CronExpression": "cron(0 12 ? * 2 *)"
+									},
+									"RetainRule": {
+										"Count": 5
+									},
+									"CopyTags": true
+								}
+							]
+						}
+					]
 				}
 			}
 		}
