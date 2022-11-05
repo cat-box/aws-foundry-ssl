@@ -46,7 +46,7 @@ sed -i "s|node /foundry/resources/app/main.js --dataPath=/foundrydata||" /etc/rc
 sed -i "s|node /foundry/resources/app/main.js --dataPath=/foundrydata||" /etc/rc.d/rc.local
 
 # install foundry as service
-sudo wget https://raw.githubusercontent.com/cat-box/aws-foundry-ssl/master/files/foundry/foundry.service -P /etc/systemd/system
+sudo wget https://raw.githubusercontent.com/cat-box/aws-foundry-ssl/71192e27e9d178d2278634587544d494e9127ee3/files/foundry/foundry.service -P /etc/systemd/system
 sudo chmod 644 /etc/systemd/system/foundry.service
 sudo systemctl daemon-reload
 
