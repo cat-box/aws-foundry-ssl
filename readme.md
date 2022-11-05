@@ -4,7 +4,7 @@ _Deploys Foundry VTT with SSL encryption in AWS using CloudFormation (Beginner F
 
 
 ![GitHub](https://img.shields.io/github/license/cat-box/aws-foundry-ssl?style=flat-square)
-[![Maintenance](https://img.shields.io/maintenance/yes/2021?style=flat-square)](https://github.com/cat-box/aws-foundry-ssl/wiki/Patches)
+[![Maintenance](https://img.shields.io/maintenance/yes/2022?style=flat-square)](https://github.com/cat-box/aws-foundry-ssl/wiki/Patches)
 ![GitHub last commit](https://img.shields.io/github/last-commit/cat-box/aws-foundry-ssl?style=flat-square&color=blue)
 [![Reddit](https://img.shields.io/badge/u/auraofire-FF4500?style=flat-square&logo=reddit&logoColor=white)](https://www.reddit.com/user/auraofire)
 

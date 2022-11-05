@@ -743,6 +743,7 @@
 								"command": "usermod -a -G foundry ec2-user"
 							},
 							"H_CW_Logs_Retention": {
+								"env": { "AWS_REGION": { "Ref": "AWS::Region" }},
 								"command": "aws --region $AWS_REGION logs put-retention-policy --log-group-name Foundry-SSL-Logs --retention-in-days 14"
 							}
 						}
