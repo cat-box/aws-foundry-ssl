@@ -3,29 +3,55 @@
 	"Description": "Automated process to setup foundry exactly as the following guides dictate https://foundry-vtt-community.github.io/wiki/Self-Hosting-on-AWS/ and https://foundryvtt.com/article/nginx/. It also allows for optional snap-shots. Made by Lupert and Cat.",
 	"Metadata": {
 		"AWS::CloudFormation::Interface": {
-			"ParameterGroups": [{
+			"ParameterGroups": [
+				{
 					"Label": {
 						"default": "Base Configuration"
 					},
-					"Parameters": ["AdminUserName", "AdminUserPW", "FoundryDownloadLink", "InstanceKey", "InstanceType", "AMI", "OptionalFixedIP", "S3BucketName", "UseExistingBucket", "TakeSnapshots", "SnapshotFrequency"]
+					"Parameters": [
+						"AdminUserName",
+						"AdminUserPW",
+						"FoundryDownloadLink",
+						"InstanceKey",
+						"InstanceType",
+						"AMI",
+						"OptionalFixedIP",
+						"OptionalSshAccess",
+						"S3BucketName",
+						"UseExistingBucket",
+						"TakeSnapshots",
+						"SnapshotFrequency"
+					]
 				},
 				{
 					"Label": {
 						"default": "SSL Configuration"
 					},
-					"Parameters": ["FullyQualifiedDomainName", "SubdomainName", "DomainRegistrar", "WebServerBool", "Email"]
+					"Parameters": [
+						"FullyQualifiedDomainName",
+						"SubdomainName",
+						"DomainRegistrar",
+						"WebServerBool",
+						"Email"
+					]
 				},
 				{
 					"Label": {
 						"default": "GoDaddy, Google, and NameCheap"
 					},
-					"Parameters": ["APIKey", "APISecret"]
+					"Parameters": [
+						"APIKey",
+						"APISecret"
+					]
 				},
 				{
 					"Label": {
 						"default": "Google Web Server"
 					},
-					"Parameters": ["GoogleAPIKey", "GoogleAPISecret"]
+					"Parameters": [
+						"GoogleAPIKey",
+						"GoogleAPISecret"
+					]
 				}
 			]
 		}
@@ -58,6 +84,12 @@
 			"ConstraintDescription": "This must be globally unique across all of AWS, so be a little creative. Must be all lowercase letters or numbers, no spaces, and no symbols expect dash (-).",
 			"Type": "String",
 			"AllowedPattern": "^[a-z|0-9]+(-[a-z|0-9]+)*$"
+		},
+		"OptionalSshAccess": {
+			"Description": "Will create a rulle allowing TCP port 22 inbound for the given IP Range. You MUST enter a range. For a single IP put /32 at the end. You will want to use your public IP (https://www.whatsmyip.org/). Example of a valid entry: 123.1.2.3/32. If you are not using this feature, leave this value blank and no SSH rule will be configured.",
+			"Type": "String",
+			"Default": "",
+			"ConstraintDescription": "Must be a valid IP/CIDR range."
 		},
 		"SnapshotFrequency": {
 			"Description": "Decides how often you want to take snapshots. This value does not matter if you select False for TakeSnapshots",
@@ -171,66 +203,86 @@
 	},
 	"Conditions": {
 		"CreateSnapshots": {
-			"Fn::Equals": [{
+			"Fn::Equals": [
+				{
 					"Ref": "TakeSnapshots"
 				},
 				"True"
 			]
 		},
+		"HasSshIP": {
+			"Fn::Not": [
+				{
+					"Fn::Equals": [
+						"",
+						{
+							"Ref": "OptionalSshAccess"
+						}
+					]
+				}
+			]
+		},
 		"CreateRoute53": {
-			"Fn::Equals": [{
+			"Fn::Equals": [
+				{
 					"Ref": "DomainRegistrar"
 				},
 				"amazon"
 			]
 		},
 		"CreateWebServer": {
-			"Fn::Equals": [{
-				"Ref": "WebServerBool"
-			},
-			"True"
-		]
+			"Fn::Equals": [
+				{
+					"Ref": "WebServerBool"
+				},
+				"True"
+			]
 		},
 		"Route53WebServer": {
 			"Fn::And": [
 				{
 					"Condition": "CreateRoute53"
-				}, 
+				},
 				{
-					"Condition": "CreateWebServer" 
+					"Condition": "CreateWebServer"
 				}
 			]
 		},
 		"NoExistingS3": {
-			"Fn::Equals": [{
+			"Fn::Equals": [
+				{
 					"Ref": "UseExistingBucket"
 				},
 				"False"
 			]
 		},
 		"CreateEIP": {
-			"Fn::Equals": [{
+			"Fn::Equals": [
+				{
 					"Ref": "OptionalFixedIP"
 				},
 				"True"
 			]
 		},
 		"DailyCheck": {
-			"Fn::Equals": [{
+			"Fn::Equals": [
+				{
 					"Ref": "SnapshotFrequency"
 				},
 				"Daily"
 			]
 		},
 		"WeeklyCheck": {
-			"Fn::Equals": [{
+			"Fn::Equals": [
+				{
 					"Ref": "SnapshotFrequency"
 				},
 				"Weekly"
 			]
 		},
 		"TakeSnapshots": {
-			"Fn::Equals": [{
+			"Fn::Equals": [
+				{
 					"Ref": "TakeSnapshots"
 				},
 				"True"
@@ -242,19 +294,24 @@
 			"Type": "AWS::EC2::SecurityGroup",
 			"Properties": {
 				"GroupDescription": "-",
-				"SecurityGroupIngress": [{
-					"IpProtocol": "tcp",
-					"FromPort": 30000,
-					"ToPort": 30000,
-					"CidrIp": "0.0.0.0/0"
-				}]
+				"SecurityGroupIngress": [
+					{
+						"IpProtocol": "tcp",
+						"FromPort": 30000,
+						"ToPort": 30000,
+						"CidrIp": "0.0.0.0/0"
+					}
+				]
 			}
 		},
 		"SecurityGroupIngressVoice": {
 			"Type": "AWS::EC2::SecurityGroupIngress",
 			"Properties": {
 				"GroupId": {
-					"Fn::GetAtt": ["FoundryServerSG", "GroupId"]
+					"Fn::GetAtt": [
+						"FoundryServerSG",
+						"GroupId"
+					]
 				},
 				"CidrIp": "0.0.0.0/0",
 				"FromPort": 80,
@@ -266,7 +323,10 @@
 			"Type": "AWS::EC2::SecurityGroupIngress",
 			"Properties": {
 				"GroupId": {
-					"Fn::GetAtt": ["FoundryServerSG", "GroupId"]
+					"Fn::GetAtt": [
+						"FoundryServerSG",
+						"GroupId"
+					]
 				},
 				"CidrIp": "0.0.0.0/0",
 				"FromPort": 49152,
@@ -278,7 +338,10 @@
 			"Type": "AWS::EC2::SecurityGroupIngress",
 			"Properties": {
 				"GroupId": {
-					"Fn::GetAtt": ["FoundryServerSG", "GroupId"]
+					"Fn::GetAtt": [
+						"FoundryServerSG",
+						"GroupId"
+					]
 				},
 				"CidrIp": "0.0.0.0/0",
 				"FromPort": 33478,
@@ -290,7 +353,10 @@
 			"Type": "AWS::EC2::SecurityGroupIngress",
 			"Properties": {
 				"GroupId": {
-					"Fn::GetAtt": ["FoundryServerSG", "GroupId"]
+					"Fn::GetAtt": [
+						"FoundryServerSG",
+						"GroupId"
+					]
 				},
 				"CidrIp": "0.0.0.0/0",
 				"FromPort": 443,
@@ -298,14 +364,43 @@
 				"ToPort": 443
 			}
 		},
+		"SecurityGroupIngressSSH": {
+			"Type": "AWS::EC2::SecurityGroupIngress",
+			"Condition": "HasSshIP",
+			"Properties": {
+				"GroupId": {
+					"Fn::GetAtt": [
+						"FoundryServerSG",
+						"GroupId"
+					]
+				},
+				"CidrIp": {
+					"Ref": "OptionalSshAccess"
+				},
+				"FromPort": 22,
+				"IpProtocol": "tcp",
+				"ToPort": 22
+			}
+		},
 		"Route53RSFoundry": {
 			"Type": "AWS::Route53::RecordSet",
 			"Condition": "CreateRoute53",
 			"Properties": {
-				"Name": { "Fn::Sub" : "${SubdomainName}.${FullyQualifiedDomainName}" },
+				"Name": {
+					"Fn::Sub": "${SubdomainName}.${FullyQualifiedDomainName}"
+				},
 				"Type": "A",
-				"HostedZoneName": { "Fn::Sub": "${FullyQualifiedDomainName}." },
-				"ResourceRecords": [{ "Fn::GetAtt": ["FoundryServer", "PublicIp"]}],
+				"HostedZoneName": {
+					"Fn::Sub": "${FullyQualifiedDomainName}."
+				},
+				"ResourceRecords": [
+					{
+						"Fn::GetAtt": [
+							"FoundryServer",
+							"PublicIp"
+						]
+					}
+				],
 				"TTL": "60"
 			}
 		},
@@ -313,10 +408,21 @@
 			"Type": "AWS::Route53::RecordSet",
 			"Condition": "Route53WebServer",
 			"Properties": {
-				"Name": { "Ref": "FullyQualifiedDomainName" },
+				"Name": {
+					"Ref": "FullyQualifiedDomainName"
+				},
 				"Type": "A",
-				"HostedZoneName": { "Fn::Sub": "${FullyQualifiedDomainName}." },
-				"ResourceRecords": [{ "Fn::GetAtt": ["FoundryServer", "PublicIp"]}],
+				"HostedZoneName": {
+					"Fn::Sub": "${FullyQualifiedDomainName}."
+				},
+				"ResourceRecords": [
+					{
+						"Fn::GetAtt": [
+							"FoundryServer",
+							"PublicIp"
+						]
+					}
+				],
 				"TTL": "60"
 			}
 		},
@@ -324,10 +430,18 @@
 			"Type": "AWS::Route53::RecordSet",
 			"Condition": "Route53WebServer",
 			"Properties": {
-				"Name": {"Fn::Sub": "www.${FullyQualifiedDomainName}" },
+				"Name": {
+					"Fn::Sub": "www.${FullyQualifiedDomainName}"
+				},
 				"Type": "CNAME",
-				"HostedZoneName": {"Fn::Sub": "${FullyQualifiedDomainName}." },
-				"ResourceRecords": [ { "Ref": "FullyQualifiedDomainName" } ],
+				"HostedZoneName": {
+					"Fn::Sub": "${FullyQualifiedDomainName}."
+				},
+				"ResourceRecords": [
+					{
+						"Ref": "FullyQualifiedDomainName"
+					}
+				],
 				"TTL": "60"
 			}
 		},
@@ -336,18 +450,22 @@
 			"Type": "AWS::S3::Bucket",
 			"Properties": {
 				"CorsConfiguration": {
-					"CorsRules": [{
-						"AllowedHeaders": [
-							"*"
-						],
-						"AllowedMethods": [
-							"GET", "POST", "HEAD"
-						],
-						"MaxAge": "3000",
-						"AllowedOrigins": [
-							"*"
-						]
-					}]
+					"CorsRules": [
+						{
+							"AllowedHeaders": [
+								"*"
+							],
+							"AllowedMethods": [
+								"GET",
+								"POST",
+								"HEAD"
+							],
+							"MaxAge": "3000",
+							"AllowedOrigins": [
+								"*"
+							]
+						}
+					]
 				},
 				"AccessControl": "PublicRead",
 				"BucketName": {
@@ -364,15 +482,17 @@
 				},
 				"PolicyDocument": {
 					"Version": "2012-10-17",
-					"Statement": [{
-						"Sid": "PublicReadGetObject",
-						"Action": "s3:GetObject",
-						"Effect": "Allow",
-						"Resource": {
-							"Fn::Sub": "arn:aws:s3:::${S3BucketName}/*"
-						},
-						"Principal": "*"
-					}]
+					"Statement": [
+						{
+							"Sid": "PublicReadGetObject",
+							"Action": "s3:GetObject",
+							"Effect": "Allow",
+							"Resource": {
+								"Fn::Sub": "arn:aws:s3:::${S3BucketName}/*"
+							},
+							"Principal": "*"
+						}
+					]
 				}
 			}
 		},
@@ -404,38 +524,236 @@
 		"FoundryUser": {
 			"Type": "AWS::IAM::User",
 			"Properties": {
-				"Policies": [{
-					"PolicyName": "S3Foundry",
-					"PolicyDocument": {
-						"Version": "2012-10-17",
-						"Statement": [{
-								"Sid": "ManageObjects",
-								"Effect": "Allow",
-								"Action": [
-									"s3:PutObject",
-									"s3:GetObject",
-									"s3:ListBucket",
-									"s3:DeleteObject",
-									"s3:PutObjectAcl"
-								],
-								"Resource": [
-									{ "Fn::Sub": "arn:aws:s3:::${S3BucketName}/*" },
-									{ "Fn::Sub": "arn:aws:s3:::${S3BucketName}" }
-								]
-							},
-							{
-								"Sid": "ListBuckets",
-								"Effect": "Allow",
-								"Action": "s3:ListAllMyBuckets",
-								"Resource": "*"
-							}
-						]
+				"Policies": [
+					{
+						"PolicyName": "S3Foundry",
+						"PolicyDocument": {
+							"Version": "2012-10-17",
+							"Statement": [
+								{
+									"Sid": "ManageObjects",
+									"Effect": "Allow",
+									"Action": [
+										"s3:PutObject",
+										"s3:GetObject",
+										"s3:ListBucket",
+										"s3:DeleteObject",
+										"s3:PutObjectAcl"
+									],
+									"Resource": [
+										{
+											"Fn::Sub": "arn:aws:s3:::${S3BucketName}/*"
+										},
+										{
+											"Fn::Sub": "arn:aws:s3:::${S3BucketName}"
+										}
+									]
+								},
+								{
+									"Sid": "ListBuckets",
+									"Effect": "Allow",
+									"Action": "s3:ListAllMyBuckets",
+									"Resource": "*"
+								}
+							]
+						}
 					}
-				}]
+				]
 			}
 		},
 		"FoundryServer": {
 			"Type": "AWS::EC2::Instance",
+			"Metadata": {
+				"AWS::CloudFormation::Init": {
+					"config": {
+						"packages": {
+							"yum": {
+								"git": [],
+								"openssl-devel": [],
+								"awslogs": []
+							}
+						},
+						"users": {
+							"foundry": {
+								"uid": "182",
+								"homeDir": "/home/foundry"
+							}
+						},
+						"files": {
+							"/foundryssl/variables.sh": {
+								"content": {
+									"Fn::Join": [
+										"",
+										[
+											"#!/bin/bash",
+											"\n",
+											"foundry_user=foundry",
+											"\n",
+											"foundry_home=/foundrydata",
+											"\n",
+											"region=",
+											{
+												"Ref": "AWS::Region"
+											},
+											"\n",
+											"domain_registrar=",
+											{
+												"Ref": "DomainRegistrar"
+											},
+											"\n",
+											"api_key=",
+											{
+												"Ref": "APIKey"
+											},
+											"\n",
+											"api_secret=",
+											{
+												"Ref": "APISecret"
+											},
+											"\n",
+											"fqdn=",
+											{
+												"Ref": "FullyQualifiedDomainName"
+											},
+											"\n",
+											"subdomain=",
+											{
+												"Ref": "SubdomainName"
+											},
+											"\n",
+											"email=",
+											{
+												"Ref": "Email"
+											},
+											"\n",
+											"webserver_bool=",
+											{
+												"Ref": "WebServerBool"
+											},
+											"\n",
+											"webserver_user=",
+											{
+												"Ref": "GoogleAPIKey"
+											},
+											"\n",
+											"webserver_pass=",
+											{
+												"Ref": "GoogleAPISecret"
+											}
+										]
+									]
+								},
+								"mode": "000700",
+								"owner": "root",
+								"group": "root"
+							},
+							"/foundryssl/variables_temp.sh": {
+								"content": {
+									"Fn::Join": [
+										"",
+										[
+											"#!/bin/bash",
+											"\n",
+											"foundry_download_link='",
+											{
+												"Ref": "FoundryDownloadLink"
+											},
+											"'\n",
+											"access_key_id=",
+											{
+												"Ref": "UserKey"
+											},
+											"\n",
+											"secret_access_key=",
+											{
+												"Fn::GetAtt": [
+													"UserKey",
+													"SecretAccessKey"
+												]
+											}
+										]
+									]
+								},
+								"mode": "000700",
+								"owner": "root",
+								"group": "root"
+							},
+							"/etc/awslogs/awslogs.conf": {
+								"content": {
+									"Fn::Join": [
+										"",
+										[
+											"[general]\n",
+											"state_file = /var/lib/awslogs/agent-state\n\n",
+											"[/tmp/foundry-setup.log]\n",
+											"file = /tmp/foundry-setup.log \n",
+											"log_stream_name = {instance_id}\n",
+											"initial_position = start_of_file\n",
+											"log_group_name = Foundry-SSL-Logs\n"
+										]
+									]
+								},
+								"mode": "000700",
+								"owner": "root",
+								"group": "root"
+							},
+							"/etc/awslogs/awscli.conf": {
+								"content": {
+									"Fn::Join": [
+										"",
+										[
+											"[plugins]\n",
+											"cwlogs = cwlogs\n",
+											"[/tmp/foundry-setup.log]\n",
+											"[default]\n",
+											"region = ",
+											{
+												"Ref": "AWS::Region"
+											}
+										]
+									]
+								},
+								"mode": "000700",
+								"owner": "root",
+								"group": "root"
+							}
+						},
+						"commands": {
+							"A_Start_CW_Logger": {
+								"command": "systemctl start awslogsd"
+							},
+							"B_Install_Nodejs_14": {
+								"command": "curl --silent --location https://rpm.nodesource.com/setup_14.x | sudo bash"
+							},
+							"C_Install_Nodejs_14_cont": {
+								"command": "yum install -y nodejs"
+							},
+							"D_Make_Dirs": {
+								"command": "mkdir -p /foundrycron /var/log/foundrycron /home/foundry/foundry-install /foundrydata"
+							},
+							"E_Git_Clone": {
+								"command": "git clone https://github.com/cat-box/aws-foundry-ssl.git",
+								"cwd": "/"
+							},
+							"F_Start_Install": {
+								"command": "sh /aws-foundry-ssl/scripts/global/install.sh",
+								"cwd": "/"
+							},
+							"G_Give_Ec2_User_Access": {
+								"command": "usermod -a -G foundry ec2-user"
+							},
+							"H_CW_Logs_Retention": {
+								"command": "aws --region $AWS_REGION logs put-retention-policy --log-group-name Foundry-SSL-Logs --retention-in-days 14"
+							}
+						}
+					}
+				}
+			},
+			"CreationPolicy": {
+                "ResourceSignal": {
+                    "Timeout": "PT25M"
+                }
+            },
 			"Properties": {
 				"KeyName": {
 					"Ref": "InstanceKey"
@@ -449,54 +767,52 @@
 				"IamInstanceProfile": {
 					"Ref": "InstanceProfile"
 				},
-				"SecurityGroupIds": [{
-					"Ref": "FoundryServerSG"
-				}],
-				"Tags": [{
-					"Key": "Name",
-					"Value": "FoundryServer"
-				}],
+				"SecurityGroupIds": [
+					{
+						"Ref": "FoundryServerSG"
+					}
+				],
+				"Tags": [
+					{
+						"Key": "Name",
+						"Value": "FoundryServer"
+					}
+				],
 				"UserData": {
 					"Fn::Base64": {
 						"Fn::Join": [
 							"",
 							[
-								"#!/bin/sh\n",
+								"#!/bin/bash -x\n",
+								"#Could not get this to work in cfn-init\n",
 								"AWS_AVAIL_ZONE=$(curl http://169.254.169.254/latest/meta-data/placement/availability-zone)\n",
 								"AWS_REGION=${AWS_AVAIL_ZONE::-1}\n",
 								"AWS_INSTANCE_ID=$(curl http://169.254.169.254/latest/meta-data/instance-id)\n",
 								"ROOT_VOLUME_IDS=$(aws ec2 describe-instances --region $AWS_REGION --instance-id $AWS_INSTANCE_ID --output text --query Reservations[0].Instances[0].BlockDeviceMappings[0].Ebs.VolumeId)\n",
-								"aws ec2 create-tags --resources $ROOT_VOLUME_IDS --region $AWS_REGION --tags Key=Snapshot,Value=true\n",
-								"curl --silent --location https://rpm.nodesource.com/setup_14.x | sudo bash -\n",
-								"sudo yum install -y git\n",
-								"cd /\n",
-								"git clone https://github.com/cat-box/aws-foundry-ssl.git\n",
-								"mkdir /foundry /aws-foundry-ssl/variables /foundryssl /foundrycron /var/log/foundrycron\n",
-								
-								"echo '#!/bin/bash' >> /aws-foundry-ssl/variables/foundry_variables.sh\n",
-								"echo 'foundry_download_link=", { "Ref": "FoundryDownloadLink" }, "' >> /aws-foundry-ssl/variables/foundry_variables.sh\n",
-								"echo 'access_key_id=", { "Ref": "UserKey" }, "' >> /aws-foundry-ssl/variables/foundry_variables.sh\n",
-								"echo 'secret_access_key=", { "Fn::GetAtt": ["UserKey", "SecretAccessKey"] }, "' >> /aws-foundry-ssl/variables/foundry_variables.sh\n",
-								"echo 'region=", { "Ref": "AWS::Region" }, "' >> /aws-foundry-ssl/variables/foundry_variables.sh\n",
-
-								"echo '#!/bin/bash' >> /foundryssl/variables.sh\n",
-								"echo 'foundry_user=foundry' >> /foundryssl/variables.sh\n",
-								"echo 'foundry_home=/foundrydata' >> /foundryssl/variables.sh\n",
-								"echo 'domain_registrar=", { "Ref": "DomainRegistrar" }, "' >> /foundryssl/variables.sh\n",
-								"echo 'api_key=", { "Ref": "APIKey" }, "' >> /foundryssl/variables.sh\n",
-								"echo 'api_secret=", { "Ref": "APISecret" }, "' >> /foundryssl/variables.sh\n",
-								"echo 'fqdn=", { "Ref": "FullyQualifiedDomainName" }, "' >> /foundryssl/variables.sh\n",
-								"echo 'subdomain=", { "Ref": "SubdomainName" }, "' >> /foundryssl/variables.sh\n",
-								"echo 'email=", { "Ref": "Email" }, "' >> /foundryssl/variables.sh\n",
-								"echo 'webserver_bool=", { "Ref": "WebServerBool" }, "' >> /foundryssl/variables.sh\n",
-								"echo 'webserver_user=", { "Ref": "GoogleAPIKey" }, "' >> /foundryssl/variables.sh\n",
-								"echo 'webserver_pass=", { "Ref": "GoogleAPISecret" }, "' >> /foundryssl/variables.sh\n",	
-								"sudo chown root:root /foundryssl/variables.sh\n",
-								"sudo chmod 700 /foundryssl/variables.sh\n",
-
-								"sudo chmod -R a+x /aws-foundry-ssl\n",
-								
-								"/aws-foundry-ssl/scripts/global/install.sh\n"
+								"aws ec2 create-tags --resources ${ROOT_VOLUME_IDS} --region $AWS_REGION --tags Key=Snapshot,Value=true\n",
+								"# Install the files and packages from the metadata\n",
+								"/opt/aws/bin/cfn-init -v ",
+								"         --stack ",
+								{
+									"Ref": "AWS::StackName"
+								},
+								"         --resource FoundryServer ",
+								"         --region ",
+								{
+									"Ref": "AWS::Region"
+								},
+								"\n",
+								"# Signal the status from cfn-init\n",
+								"/opt/aws/bin/cfn-signal -e $? ",
+								"         --stack ",
+								{
+									"Ref": "AWS::StackName"
+								},
+								"         --resource FoundryServer ",
+								"         --region ",
+								{
+									"Ref": "AWS::Region"
+								}
 							]
 						]
 					}
@@ -509,107 +825,57 @@
 			"Properties": {
 				"AssumeRolePolicyDocument": {
 					"Version": "2012-10-17",
-					"Statement": [{
-						"Effect": "Allow",
-						"Principal": {
-							"Service": [
-								"ec2.amazonaws.com"
+					"Statement": [
+						{
+							"Effect": "Allow",
+							"Principal": {
+								"Service": [
+									"ec2.amazonaws.com"
+								]
+							},
+							"Action": [
+								"sts:AssumeRole"
 							]
-						},
-						"Action": [
-							"sts:AssumeRole"
-						]
-					}]
+						}
+					]
 				},
-				"Policies": [{
-					"PolicyName": "EC2Manager",
-					"PolicyDocument": {
-						"Version": "2012-10-17",
-						"Statement": [
-							{
-								"Sid": "VisualEditor0",
-								"Effect": "Allow",
-								"Action": [
-									"ec2:CopySnapshot",
-									"ec2:DescribeInstances",
-									"ec2:ModifyVolumeAttribute",
-									"ec2:CreateKeyPair",
-									"route53:GetHostedZone",
-									"ec2:CreateImage",
-									"ec2:CopyImage",
-									"ec2:DescribeSnapshots",
-									"ec2:GetConsoleScreenshot",
-									"ec2:DescribeInternetGateways",
-									"ec2:DescribeVolumeStatus",
-									"ec2:ModifySnapshotAttribute",
-									"ec2:StartInstances",
-									"ec2:DescribeVolumes",
-									"route53:ListResourceRecordSets",
-									"ec2:DescribeAccountAttributes",
-									"route53:GetHostedZoneCount",
-									"route53:UpdateHostedZoneComment",
-									"ec2:ImportImage",
-									"ec2:DescribeKeyPairs",
-									"ec2:DescribeNetworkAcls",
-									"ec2:DescribeRouteTables",
-									"ec2:ModifyVolume",
-									"ec2:CancelExportTask",
-									"route53:CreateHostedZone",
-									"ec2:DisableFastSnapshotRestores",
-									"ec2:ImportKeyPair",
-									"ec2:CreateTags",
-									"route53:ChangeResourceRecordSets",
-									"ec2:RunInstances",
-									"ec2:StopInstances",
-									"ec2:DescribeVolumeAttribute",
-									"ec2:CreateVolume",
-									"ec2:DescribeImportSnapshotTasks",
-									"ec2:CreateSnapshots",
-									"ec2:DescribeImageAttribute",
-									"ec2:DescribeInstanceTypes",
-									"ec2:DescribeSubnets",
-									"ec2:ExportImage",
-									"ec2:AttachVolume",
-									"ec2:ImportVolume",
-									"ec2:DeleteSnapshot",
-									"ec2:DeleteTags",
-									"ec2:DescribeInstanceAttribute",
-									"ec2:DescribeRegions",
-									"ec2:CreateVpc",
-									"ec2:DescribeVpcAttribute",
-									"ec2:GetConsoleOutput",
-									"ec2:EnableFastSnapshotRestores",
-									"ec2:DescribeAvailabilityZones",
-									"ec2:CreateSecurityGroup",
-									"ec2:CreateSnapshot",
-									"route53:DeleteHostedZone",
-									"ec2:DescribeInstanceStatus",
-									"ec2:DescribeTags",
-									"ec2:ResetSnapshotAttribute",
-									"ec2:ImportSnapshot",
-									"route53:ListHostedZones",
-									"ec2:DescribeImportImageTasks",
-									"ec2:DescribeNatGateways",
-									"ec2:DescribeInstanceEventNotificationAttributes",
-									"ec2:DescribeSecurityGroups",
-									"ec2:DescribeImages",
-									"ec2:DescribeSecurityGroupReferences",
-									"ec2:DescribeVpcs",
-									"ec2:CancelImportTask"
-								],
-								"Resource": "*"
-							}
-						]
+				"Policies": [
+					{
+						"PolicyName": "EC2Manager",
+						"PolicyDocument": {
+							"Version": "2012-10-17",
+							"Statement": [
+								{
+									"Sid": "VisualEditor0",
+									"Effect": "Allow",
+									"Action": [
+										"ec2:DescribeInstances",
+										"ec2:CreateTags",
+										"route53:ListResourceRecordSets",
+										"route53:ChangeResourceRecordSets",
+										"route53:ListHostedZones",
+										"logs:CreateLogGroup",
+										"logs:CreateLogStream",
+										"logs:PutLogEvents",
+										"logs:DescribeLogStreams",
+										"logs:PutRetentionPolicy"
+									],
+									"Resource": "*"
+								}
+							]
+						}
 					}
-				}]
+				]
 			}
 		},
 		"InstanceProfile": {
 			"Type": "AWS::IAM::InstanceProfile",
 			"Properties": {
-				"Roles": [{
-					"Ref": "InstanceRole"
-				}]
+				"Roles": [
+					{
+						"Ref": "InstanceRole"
+					}
+				]
 			}
 		},
 		"InstanceEIP": {
@@ -628,42 +894,49 @@
 				"State": "ENABLED",
 				"Description": "Foundry Server snapshot policy",
 				"ExecutionRoleArn": {
-					"Fn::GetAtt": ["InstanceRole", "Arn"]
+					"Fn::GetAtt": [
+						"InstanceRole",
+						"Arn"
+					]
 				},
 				"PolicyDetails": {
 					"PolicyType": "EBS_SNAPSHOT_MANAGEMENT",
 					"ResourceTypes": [
 						"VOLUME"
 					],
-					"TargetTags": [{
-						"Key": "Snapshot",
-						"Value": "true"
-					}],
-					"Schedules": [{
-						"Fn::If": [
-							"DailyCheck",
-							{
-								"Name": "Snapshots",
-								"CreateRule": {
-									"CronExpression": "cron(0 12 * * ? *)"
+					"TargetTags": [
+						{
+							"Key": "Snapshot",
+							"Value": "true"
+						}
+					],
+					"Schedules": [
+						{
+							"Fn::If": [
+								"DailyCheck",
+								{
+									"Name": "Snapshots",
+									"CreateRule": {
+										"CronExpression": "cron(0 12 * * ? *)"
+									},
+									"RetainRule": {
+										"Count": 5
+									},
+									"CopyTags": true
 								},
-								"RetainRule": {
-									"Count": 5
-								},
-								"CopyTags": true
-							},
-							{
-								"Name": "Snapshots",
-								"CreateRule": {
-									"CronExpression": "cron(0 12 ? * 2 *)"
-								},
-								"RetainRule": {
-									"Count": 5
-								},
-								"CopyTags": true
-							}
-						]
-					}]
+								{
+									"Name": "Snapshots",
+									"CreateRule": {
+										"CronExpression": "cron(0 12 ? * 2 *)"
+									},
+									"RetainRule": {
+										"Count": 5
+									},
+									"CopyTags": true
+								}
+							]
+						}
+					]
 				}
 			}
 		}
