@@ -732,7 +732,7 @@
 								"command": "mkdir -p /foundrycron /var/log/foundrycron /home/foundry/foundry-install /foundrydata"
 							},
 							"E_Git_Clone": {
-								"command": "git clone --branch dev https://github.com/cat-box/aws-foundry-ssl.git",
+								"command": "git clone https://github.com/cat-box/aws-foundry-ssl.git",
 								"cwd": "/"
 							},
 							"F_Start_Install": {
@@ -749,6 +749,11 @@
 					}
 				}
 			},
+			"CreationPolicy": {
+                "ResourceSignal": {
+                    "Timeout": "PT25M"
+                }
+            },
 			"Properties": {
 				"KeyName": {
 					"Ref": "InstanceKey"
